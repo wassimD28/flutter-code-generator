@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+{{#if useGetIt}}
+import 'package:get_it/get_it.dart';
+import 'package:{{appName.toLowerCase()}}/services/service_locator.dart';
+{{/if}}
+{{#if useSplashScreen}}
+import 'package:{{appName.toLowerCase()}}/screens/splash_screen.dart';
+{{/if}}
+import 'package:{{appName.toLowerCase()}}/screens/home_screen.dart';
+
+void main() {
+  {{#if useGetIt}}
+  // Initialize service locator
+  setupServiceLocator();
+  {{/if}}
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '{{storeName}}',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.{{primaryColor}},
+        {{#if secondaryColor}}
+        secondaryHeaderColor: Colors.{{secondaryColor}},
+        {{/if}}
+        fontFamily: '{{fontFamily}}',
+        useMaterial3: true,
+      ),
+      {{#if useSplashScreen}}
+      home: const SplashScreen(),
+      {{else}}
+      home: const HomeScreen(),
+      {{/if}}
+      {{#if useRoutes}}
+      routes: {
+        {{#each routes}}
+        '{{path}}': (context) => const {{component}}(),
+        {{/each}}
+      },
+      {{/if}}
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('{{storeName}}'),
+        {{#if hasLogo}}
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset('assets/images/logo.png'),
+        ),
+        {{/if}}
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              '{{welcomeMessage}}',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            {{#if features}}
+            {{#each features}}
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Text(
+                '{{this}}',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            {{/each}}
+            {{/if}}
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add your action here
+        },
+        tooltip: 'Action',
+        child: const Icon(Icons.add_shopping_cart),
+      ),
+    );
+  }
+}

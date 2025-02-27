@@ -38,3 +38,10 @@ flutter-generator/
 │   └── integration/       # Integration tests
 └── README.md              # Project documentation
 ```
+Each part of the system has a specific responsibility:
+
+**models:** define the data structures<br>
+**core:** handles the business logic<br>
+**utils:** provide reusable helpers<br>
+**cli:** manages the command-line interface<br>
+**templates:** store the template files<br>

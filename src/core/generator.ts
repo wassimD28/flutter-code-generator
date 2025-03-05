@@ -1,10 +1,10 @@
 import path from "path";
-import { ProcessedConfig, StoreConfig } from "../models/config";
+import { ProcessedConfig, ProjectStructure, StoreConfig } from "../models/config";
 import { FileUtils } from "../utils/file";
 import { TemplateUtils } from "../utils/template";
 import { ImageUtils } from "../utils/image";
 import { Logger } from "../cli/logger";
-
+import fs from "fs/promises";
 export class FlutterAppGenerator {
   private fileUtils: FileUtils;
   private templateUtils: TemplateUtils;
@@ -56,23 +56,25 @@ export class FlutterAppGenerator {
 
     // Generate main.dart
     const mainContent = await this.templateUtils.compileTemplate(
-      "main",
+      "main.dart.hbs",
       config
     );
     await this.fileUtils.writeFile(
       path.join(outputDir, "lib", "main.dart"),
       mainContent
     );
+    this.logger.info(`Generated main.dart`);
 
     // Generate pubspec.yaml
     const pubspecContent = await this.templateUtils.compileTemplate(
-      "pubspec",
+      "pubspec.yaml.hbs",
       config
     );
     await this.fileUtils.writeFile(
       path.join(outputDir, "pubspec.yaml"),
       pubspecContent
     );
+    this.logger.info(`Generated pubspec.yaml`);
 
     // Generate other files
     await this.generateAdditionalFiles(config, outputDir);
@@ -91,9 +93,32 @@ export class FlutterAppGenerator {
     config: ProcessedConfig,
     outputDir: string
   ): Promise<void> {
-    // Generate screens, models, etc.
-    // This would expand based on your needs
-    this.logger.info("Generating additional files...");
+    const structure = config.projectStructure || {};
+
+    // Ensure controller directory exists
+    const controllerDir = path.join(outputDir, 'lib', 'controllers');
+    await fs.mkdir(controllerDir, { recursive: true });
+
+    // Generate each controller
+    for (const controller of structure.controllers || []) {
+      try {
+        const controllerContent = await this.templateUtils.compileTemplate(
+          `${controller}_controller.dart.hbs`,
+          {
+            controllerName: controller,
+            ...config
+          },
+          ProjectStructure.CONTROLLERS
+        );
+
+        const controllerPath = path.join(controllerDir, `${controller}_controller.dart`);
+
+        await this.fileUtils.writeFile(controllerPath, controllerContent);
+        this.logger.info(`Generated controller: ${controller}`);
+      } catch (error) {
+        this.logger.error(`Failed to generate controller ${controller}: ${error}`);
+      }
+    }
   }
 
   /**

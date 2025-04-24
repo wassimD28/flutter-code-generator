@@ -1,5 +1,5 @@
 import path from "path";
-import { ProcessedConfig, ProjectStructure, StoreConfig } from "../models/config";
+import { ProcessedConfig, StoreConfig } from "../models/config";
 import { FileUtils } from "../utils/file";
 import { TemplateUtils } from "../utils/template";
 import { ImageUtils } from "../utils/image";
@@ -22,14 +22,14 @@ export class FlutterAppGenerator {
    * Process raw configuration and apply defaults
    */
   processConfig(config: StoreConfig): ProcessedConfig {
-    this.logger.info(`Processing configuration for store: ${config.storeName}`);
+    this.logger.info(
+      `Processing configuration for store: ${config.metadata.storeName}`
+    );
 
     return {
       ...config,
-      appName: config.storeName || "StoreGo App",
-      description: config.description || `Mobile app for ${config.storeName}`,
-      primaryColor: config.primaryColor || "blue",
-      welcomeMessage: `Welcome to ${config.storeName}!`,
+      appName: config.metadata.storeName || "StoreGo App",
+      welcomeMessage: `Welcome to ${config.metadata.storeName}!`,
     };
   }
 
@@ -40,83 +40,98 @@ export class FlutterAppGenerator {
     rawConfig: StoreConfig,
     outputDir: string
   ): Promise<string> {
-    // Process and validate config
+    // Process config
     const config = this.processConfig(rawConfig);
-    this.logger.info(`Generating app for: ${config.appName}`);
+    this.logger.info(`Generating app for: ${config.metadata.storeName}`);
 
-    // Create directory structure
+    // Create directory structure based on projectStructure
     await this.fileUtils.createDirectoryStructure(outputDir);
 
-    // Download assets if available
-    if (config.logoUrl) {
-      const logoPath = path.join(outputDir, "assets", "images", "logo.png");
-      await this.imageUtils.downloadImage(config.logoUrl, logoPath);
-      this.logger.info(`Downloaded logo to: ${logoPath}`);
-    }
+    // Download all assets defined in config
+    await this.downloadAssets(config, outputDir);
 
-    // Generate main.dart
-    const mainContent = await this.templateUtils.compileTemplate(
-      "main.dart.hbs",
-      config
-    );
-    await this.fileUtils.writeFile(
-      path.join(outputDir, "lib", "main.dart"),
-      mainContent
-    );
-    this.logger.info(`Generated main.dart`);
+    // Generate project structure based on the config
+    await this.generateProjectStructure(config, outputDir);
 
-    // Generate pubspec.yaml
-    const pubspecContent = await this.templateUtils.compileTemplate(
-      "pubspec.yaml.hbs",
-      config
-    );
-    await this.fileUtils.writeFile(
-      path.join(outputDir, "pubspec.yaml"),
-      pubspecContent
-    );
-    this.logger.info(`Generated pubspec.yaml`);
-
-    // Generate other files
-    await this.generateAdditionalFiles(config, outputDir);
-
-    // Create manifest file for debugging
+    // Create manifest file
     await this.createManifest(config, outputDir);
 
     this.logger.success(`App generated successfully at: ${outputDir}`);
     return outputDir;
   }
 
-  /**
-   * Generate additional app files based on configuration
-   */
-  private async generateAdditionalFiles(
+  // New method to download all assets
+  private async downloadAssets(
     config: ProcessedConfig,
     outputDir: string
   ): Promise<void> {
-    const structure = config.projectStructure || {};
+    if (config.assets?.images) {
+      for (const image of config.assets.images) {
+        const imagePath = path.join(outputDir, image.path);
+        await this.imageUtils.downloadImage(image.url, imagePath);
+        this.logger.info(`Downloaded image to: ${imagePath}`);
+      }
+    }
+  }
 
-    // Ensure controller directory exists
-    const controllerDir = path.join(outputDir, 'lib', 'controllers');
-    await fs.mkdir(controllerDir, { recursive: true });
+  // New method to generate the full project structure
+  private async generateProjectStructure(
+    config: ProcessedConfig,
+    outputDir: string
+  ): Promise<void> {
+    const structure = config.projectStructure;
 
-    // Generate each controller
-    for (const controller of structure.controllers || []) {
+    // Generate entry point (main.dart)
+    const entryPath = path.join(outputDir, structure.entry.path);
+    const entryContent = await this.templateUtils.compileTemplate(
+      "main.dart.hbs",
+      config
+    );
+    await this.fileUtils.writeFile(entryPath, entryContent);
+    this.logger.info(`Generated ${structure.entry.name}`);
+
+    // Generate files for each section of the project structure
+    await this.generateStructureSection(structure.core, config, outputDir);
+    await this.generateStructureSection(structure.services, config, outputDir);
+    await this.generateStructureSection(structure.theme, config, outputDir);
+    await this.generateStructureSection(structure.utils, config, outputDir);
+    await this.generateStructureSection(structure.dependency_injection, config, outputDir);
+    await this.generateStructureSection(structure.shared_controllers, config, outputDir);
+    await this.generateStructureSection(structure.shared_widgets, config, outputDir);
+    await this.generateStructureSection(structure.button_components, config, outputDir);
+    await this.generateStructureSection(structure.controllers, config, outputDir);
+    await this.generateStructureSection(structure.models, config, outputDir);
+    await this.generateStructureSection(structure.repositories, config, outputDir);
+    await this.generateStructureSection(structure.bindings, config, outputDir);
+    await this.generateStructureSection(structure.screens, config, outputDir);
+    await this.generateStructureSection(structure.widgets, config, outputDir);
+  }
+  // Helper method to generate files for a section of the project structure
+  private async generateStructureSection(
+    items: Array<{ name: string; path: string }> | undefined,
+    config: ProcessedConfig,
+    outputDir: string
+  ): Promise<void> {
+    if (!items) return;
+
+    for (const item of items) {
       try {
-        const controllerContent = await this.templateUtils.compileTemplate(
-          `${controller}_controller.dart.hbs`,
-          {
-            controllerName: controller,
-            ...config
-          },
-          ProjectStructure.CONTROLLERS
+        // Create a template name based on the item's path
+        const filename = path.basename(item.path);
+        const templateName = `${filename}.hbs`;
+
+        // Compile the template
+        const content = await this.templateUtils.compileTemplate(
+          templateName,
+          config
         );
 
-        const controllerPath = path.join(controllerDir, `${controller}_controller.dart`);
-
-        await this.fileUtils.writeFile(controllerPath, controllerContent);
-        this.logger.info(`Generated controller: ${controller}`);
+        // Write the file
+        this.logger.info(`Generating ${item.name}`);
+        const filePath = path.join(outputDir, item.path);
+        await this.fileUtils.writeFile(filePath, content);
       } catch (error) {
-        this.logger.error(`Failed to generate controller ${controller}: ${error}`);
+        this.logger.warn(`Could not generate ${item.name}: ${error}`);
       }
     }
   }
@@ -131,8 +146,8 @@ export class FlutterAppGenerator {
     const manifest = {
       generatedAt: new Date().toISOString(),
       config: {
-        storeId: config.storeId,
-        storeName: config.storeName,
+        storeId: config.metadata.storeId,
+        storeName: config.metadata.storeName,
         // Include non-sensitive config details
       },
       files: await this.fileUtils.getGeneratedFilesList(outputDir),

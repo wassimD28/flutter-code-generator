@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import Handlebars from "handlebars";
-import { ProjectStructure, StoreConfig } from "../models/config";
+import { StoreConfig } from "../models/config";
 export class TemplateUtils {
   private baseTemplatesDir: string;
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;

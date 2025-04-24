@@ -48,17 +48,13 @@ export class ImageUtils {
 
     // Process logo
     if (config.logoUrl) {
-      const logoPath = path.join(outputDir, "assets", "images", "logo.png");
+      const logoPath = path.join(outputDir, "assets", "icons", "app_icon.png");
       await this.downloadImage(config.logoUrl, logoPath);
-      imageMapping.logo = "assets/images/logo.png";
+      imageMapping.logo = "assets/icons/app_icon.png";
     }
 
-    // Process banner if available
-    if (config.bannerUrl) {
-      const bannerPath = path.join(outputDir, "assets", "images", "banner.png");
-      await this.downloadImage(config.bannerUrl, bannerPath);
-      imageMapping.banner = "assets/images/banner.png";
-    }
+    
+    
 
     // Add more image types as needed
 

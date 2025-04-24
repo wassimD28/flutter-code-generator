@@ -1,44 +1,62 @@
 import fs from "fs/promises";
 import path from "path";
 import Handlebars from "handlebars";
-import { StoreConfig } from "../models/config";
+
+// Define the ProjectStructure enum that was missing
+export enum ProjectStructure {
+  LIB = "lib",
+  ROOT = "root",
+  ASSETS = "assets",
+}
+
 export class TemplateUtils {
   private baseTemplatesDir: string;
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;
 
-  constructor(baseTemplatesDir = path.join(__dirname, '..', 'templates')) {
+  constructor(baseTemplatesDir = path.join(__dirname, "..", "templates")) {
     this.baseTemplatesDir = baseTemplatesDir;
     this.templatesCache = new Map();
+
+    // Register Handlebars helpers
+    this.registerHelpers();
+  }
+
+  /**
+   * Register all Handlebars helpers
+   */
+  private registerHelpers(): void {
     Handlebars.registerHelper("snakeCase", function (str) {
       if (typeof str !== "string") return "";
 
       // Convert camelCase boundaries to snake_case
-      str = str.replace(/([a-z])([A-Z])/g, '$1_$2');
+      str = str.replace(/([a-z])([A-Z])/g, "$1_$2");
 
       // Replace spaces and non-word characters with underscores
-      str = str.replace(/[\s\W]+/g, '_');
+      str = str.replace(/[\s\W]+/g, "_");
 
       // Convert to lowercase
       str = str.toLowerCase();
 
       // Remove any leading or trailing underscores
-      str = str.replace(/^_+|_+$/g, '');
+      str = str.replace(/^_+|_+$/g, "");
 
       return str;
     });
 
-    Handlebars.registerHelper('pascalCase', (str: string) => {
+    Handlebars.registerHelper("pascalCase", (str: string) => {
       return str
         .split(/[-_\s]/)
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join('');
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join("");
     });
 
-    Handlebars.registerHelper('camelCase', (str: string) => {
+    Handlebars.registerHelper("camelCase", (str: string) => {
       const pascalCased = Handlebars.helpers.pascalCase(str);
       return pascalCased.charAt(0).toLowerCase() + pascalCased.slice(1);
     });
-    // Register Handlebars helpers
+
     Handlebars.registerHelper("toLowerCase", (str) => str.toLowerCase());
 
     // Add a slugify helper to create valid package names
@@ -47,14 +65,14 @@ export class TemplateUtils {
       let slug = str.toLowerCase();
 
       // Replace non-alphanumeric characters with underscores
-      slug = slug.replace(/[^a-z0-9]/g, '_');
+      slug = slug.replace(/[^a-z0-9]/g, "_");
 
       // Remove consecutive underscores
-      slug = slug.replace(/_+/g, '_');
+      slug = slug.replace(/_+/g, "_");
 
       // Ensure it starts with a letter
       if (/^[^a-z]/.test(slug)) {
-        slug = 'app_' + slug;
+        slug = "app_" + slug;
       }
 
       return slug;
@@ -64,12 +82,21 @@ export class TemplateUtils {
   /**
    * Load a template from file
    */
-  private async loadTemplate(templateName: string, projectStructure: ProjectStructure): Promise<string> {
+  private async loadTemplate(
+    templateName: string,
+    projectStructure: ProjectStructure
+  ): Promise<string> {
     let templatePath: string;
+
+    // Special case for pubspec.yaml
     if (templateName === "pubspec.yaml.hbs") {
-      templatePath = path.join(this.baseTemplatesDir, templateName)
+      templatePath = path.join(this.baseTemplatesDir, templateName);
     } else {
-      templatePath = path.join(this.baseTemplatesDir, projectStructure, templateName)
+      templatePath = path.join(
+        this.baseTemplatesDir,
+        projectStructure,
+        templateName
+      );
     }
 
     try {
@@ -77,24 +104,36 @@ export class TemplateUtils {
       await fs.access(templatePath);
       const templateContent = await fs.readFile(templatePath, "utf-8");
       return templateContent;
-    } catch {
-      throw new Error(`Failed to load template: ${templateName}.`)
+    } catch (error) {
+      throw new Error(
+        `Failed to load template: ${templateName}. ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
+
   /**
    * Compile a template with provided context
    */
-  async compileTemplate<T>(templateName: string, context: T, projectStructure?: ProjectStructure): Promise<string> {
-    if (!projectStructure) {
-      projectStructure = ProjectStructure.LIB;
-    }
+  async compileTemplate<T>(
+    templateName: string,
+    context: T,
+    projectStructure: ProjectStructure = ProjectStructure.LIB
+  ): Promise<string> {
+    // Generate a cache key that includes both template name and structure
+    const cacheKey = `${projectStructure}:${templateName}`;
+
     // Check cache first
-    if (!this.templatesCache.has(templateName)) {
-      const templateSource = await this.loadTemplate(templateName, projectStructure);
-      this.templatesCache.set(templateName, Handlebars.compile(templateSource));
+    if (!this.templatesCache.has(cacheKey)) {
+      const templateSource = await this.loadTemplate(
+        templateName,
+        projectStructure
+      );
+      this.templatesCache.set(cacheKey, Handlebars.compile(templateSource));
     }
 
-    const template = this.templatesCache.get(templateName);
+    const template = this.templatesCache.get(cacheKey);
     if (!template) {
       throw new Error(`Template not found: ${templateName}`);
     }
@@ -102,5 +141,3 @@ export class TemplateUtils {
     return template(context);
   }
 }
-
-

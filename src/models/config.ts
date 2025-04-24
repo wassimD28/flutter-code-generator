@@ -1,3 +1,4 @@
+import { ThemeDesign } from "./theme";
 
 export interface StoreConfig {
   metadata: {
@@ -17,11 +18,7 @@ export interface StoreConfig {
     supportedLocales: string[];
   };
   design: {
-    theme: {
-      colors: any;
-      typography: any;
-      spacing: any;
-    };
+    theme: ThemeDesign;
   };
   features: {
     [key: string]: {

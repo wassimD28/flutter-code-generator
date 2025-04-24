@@ -43,7 +43,12 @@ export class FlutterAppGenerator {
     // Process config
     const config = this.processConfig(rawConfig);
     this.logger.info(`Generating app for: ${config.metadata.storeName}`);
-
+    // Validate templates before starting generation
+    this.logger.info("Validating templates...");
+    const templatesValid = await this.validateTemplates(config);
+    if (!templatesValid) {
+      throw new Error("Generation failed due to missing template files");
+    }
     // Create directory structure based on projectStructure
     await this.fileUtils.createDirectoryStructure(outputDir);
 
@@ -140,27 +145,24 @@ export class FlutterAppGenerator {
     if (!items) return;
 
     for (const item of items) {
-      try {
-        // Create a template name based on the item's path
-        const filename = path.basename(item.path);
-        const templateName = `${filename}.hbs`;
+      // Create a template name based on the item's path
+      const filename = path.basename(item.path);
+      const templateName = `${filename}.hbs`;
 
-        // Compile the template
-        const content = await this.templateUtils.compileTemplate(
-          templateName,
-          config
-        );
+      // Log which file we're generating
+      this.logger.info(`Generating ${item.name}`);
 
-        // Write the file
-        this.logger.info(`Generating ${item.name}`);
-        const filePath = path.join(outputDir, item.path);
-        await this.fileUtils.writeFile(filePath, content);
-      } catch (error) {
-        this.logger.warn(`Could not generate ${item.name}: ${error}`);
-      }
+      // Compile the template - if the template doesn't exist, this will throw an error
+      const content = await this.templateUtils.compileTemplate(
+        templateName,
+        config
+      );
+
+      // Write the file
+      const filePath = path.join(outputDir, item.path);
+      await this.fileUtils.writeFile(filePath, content);
     }
   }
-
   /**
    * Create a manifest file containing generation details
    */
@@ -216,5 +218,143 @@ export class FlutterAppGenerator {
       ProjectStructure.ANDROID
     );
     await this.fileUtils.writeFile(manifestPath, manifestContent);
+  }
+
+  // template validation method that organizes errors by category
+  private async validateTemplates(config: ProcessedConfig): Promise<boolean> {
+    // Create a structured object to group missing templates by category
+    const missingTemplates: Record<string, string[]> = {
+      core: [],
+      services: [],
+      theme: [],
+      utils: [],
+      controllers: [],
+      models: [],
+      repositories: [],
+      bindings: [],
+      screens: [],
+      widgets: [],
+      other: [],
+    };
+
+    // Helper function to check templates for a structure section
+    const checkTemplatesForSection = async (
+      items: Array<{ name: string; path: string }> | undefined,
+      category: string
+    ) => {
+      if (!items) return;
+
+      for (const item of items) {
+        const filename = path.basename(item.path);
+        const templateName = `${filename}.hbs`;
+
+        try {
+          await this.templateUtils.loadTemplate(
+            templateName,
+            ProjectStructure.LIB
+          );
+        } catch (error) {
+          // Add to the appropriate category
+          if (missingTemplates[category]) {
+            missingTemplates[category].push(templateName);
+          } else {
+            missingTemplates.other.push(templateName);
+          }
+        }
+      }
+    };
+
+    // Check main entry template
+    try {
+      await this.templateUtils.loadTemplate(
+        "main.dart.hbs",
+        ProjectStructure.LIB
+      );
+    } catch (error) {
+      missingTemplates.core.push("main.dart.hbs");
+    }
+
+    // Check templates for each section, mapping to the appropriate category
+    await checkTemplatesForSection(config.projectStructure.core, "core");
+    await checkTemplatesForSection(
+      config.projectStructure.services,
+      "services"
+    );
+    await checkTemplatesForSection(config.projectStructure.theme, "theme");
+    await checkTemplatesForSection(config.projectStructure.utils, "utils");
+    await checkTemplatesForSection(
+      config.projectStructure.dependency_injection,
+      "core"
+    );
+    await checkTemplatesForSection(
+      config.projectStructure.shared_controllers,
+      "controllers"
+    );
+    await checkTemplatesForSection(
+      config.projectStructure.shared_widgets,
+      "widgets"
+    );
+    await checkTemplatesForSection(
+      config.projectStructure.button_components,
+      "widgets"
+    );
+    await checkTemplatesForSection(
+      config.projectStructure.controllers,
+      "controllers"
+    );
+    await checkTemplatesForSection(config.projectStructure.models, "models");
+    await checkTemplatesForSection(
+      config.projectStructure.repositories,
+      "repositories"
+    );
+    await checkTemplatesForSection(
+      config.projectStructure.bindings,
+      "bindings"
+    );
+    await checkTemplatesForSection(config.projectStructure.screens, "screens");
+    await checkTemplatesForSection(config.projectStructure.widgets, "widgets");
+
+    // Check if we have any missing templates
+    const hasMissingTemplates = Object.values(missingTemplates).some(
+      (category) => category.length > 0
+    );
+
+    // Log them in a structured, organized format
+    if (hasMissingTemplates) {
+      this.logger.error("Missing template files:");
+
+      // Log missing templates by category
+      for (const [category, templates] of Object.entries(missingTemplates)) {
+        if (templates.length > 0) {
+          this.logger.error(
+            `\n${category.toUpperCase()} (${templates.length} files):`
+          );
+
+          // Format each category's templates in columns (3 per line)
+          let line = "";
+          for (let i = 0; i < templates.length; i++) {
+            const paddedTemplate = templates[i].padEnd(40);
+            line += paddedTemplate;
+
+            // Break into columns of 3
+            if ((i + 1) % 3 === 0 || i === templates.length - 1) {
+              this.logger.error(`  ${line.trimEnd()}`);
+              line = "";
+            }
+          }
+        }
+      }
+
+      // Count total missing templates
+      const totalMissing = Object.values(missingTemplates).reduce(
+        (sum, templates) => sum + templates.length,
+        0
+      );
+      this.logger.error(`\nTotal missing templates: ${totalMissing}`);
+
+      return false;
+    }
+
+    return true;
   }
 }

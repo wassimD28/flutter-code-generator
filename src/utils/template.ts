@@ -82,7 +82,7 @@ export class TemplateUtils {
   /**
    * Load a template from file
    */
-  private async loadTemplate(
+  async loadTemplate(
     templateName: string,
     projectStructure: ProjectStructure
   ): Promise<string> {
@@ -106,9 +106,7 @@ export class TemplateUtils {
       return templateContent;
     } catch (error) {
       throw new Error(
-        `Failed to load template: ${templateName}. ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Template not found: ${templateName} at path: ${templatePath}. Please ensure the template exists before running the generator.`
       );
     }
   }
@@ -140,4 +138,5 @@ export class TemplateUtils {
 
     return template(context);
   }
+  
 }

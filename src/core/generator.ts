@@ -1,7 +1,7 @@
 import path from "path";
 import { ProcessedConfig, StoreConfig } from "../models/config";
 import { FileUtils } from "../utils/file";
-import { TemplateUtils } from "../utils/template";
+import { ProjectStructure, TemplateUtils } from "../utils/template";
 import { ImageUtils } from "../utils/image";
 import { Logger } from "../cli/logger";
 import fs from "fs/promises";
@@ -95,16 +95,41 @@ export class FlutterAppGenerator {
     await this.generateStructureSection(structure.services, config, outputDir);
     await this.generateStructureSection(structure.theme, config, outputDir);
     await this.generateStructureSection(structure.utils, config, outputDir);
-    await this.generateStructureSection(structure.dependency_injection, config, outputDir);
-    await this.generateStructureSection(structure.shared_controllers, config, outputDir);
-    await this.generateStructureSection(structure.shared_widgets, config, outputDir);
-    await this.generateStructureSection(structure.button_components, config, outputDir);
-    await this.generateStructureSection(structure.controllers, config, outputDir);
+    await this.generateStructureSection(
+      structure.dependency_injection,
+      config,
+      outputDir
+    );
+    await this.generateStructureSection(
+      structure.shared_controllers,
+      config,
+      outputDir
+    );
+    await this.generateStructureSection(
+      structure.shared_widgets,
+      config,
+      outputDir
+    );
+    await this.generateStructureSection(
+      structure.button_components,
+      config,
+      outputDir
+    );
+    await this.generateStructureSection(
+      structure.controllers,
+      config,
+      outputDir
+    );
     await this.generateStructureSection(structure.models, config, outputDir);
-    await this.generateStructureSection(structure.repositories, config, outputDir);
+    await this.generateStructureSection(
+      structure.repositories,
+      config,
+      outputDir
+    );
     await this.generateStructureSection(structure.bindings, config, outputDir);
     await this.generateStructureSection(structure.screens, config, outputDir);
     await this.generateStructureSection(structure.widgets, config, outputDir);
+    await this.generateAndroidFiles(config, outputDir);
   }
   // Helper method to generate files for a section of the project structure
   private async generateStructureSection(
@@ -157,5 +182,39 @@ export class FlutterAppGenerator {
       path.join(outputDir, "generation-manifest.json"),
       JSON.stringify(manifest, null, 2)
     );
+  }
+  private async generateAndroidFiles(
+    config: ProcessedConfig,
+    outputDir: string
+  ): Promise<void> {
+    // Generate build.gradle.kts
+    const buildGradlePath = path.join(
+      outputDir,
+      "android",
+      "app",
+      "build.gradle.kts"
+    );
+    const buildGradleContent = await this.templateUtils.compileTemplate(
+      "build.gradle.kts.hbs",
+      config,
+      ProjectStructure.ANDROID
+    );
+    await this.fileUtils.writeFile(buildGradlePath, buildGradleContent);
+
+    // Generate AndroidManifest.xml
+    const manifestPath = path.join(
+      outputDir,
+      "android",
+      "app",
+      "src",
+      "main",
+      "AndroidManifest.xml"
+    );
+    const manifestContent = await this.templateUtils.compileTemplate(
+      "AndroidManifest.xml.hbs",
+      config,
+      ProjectStructure.ANDROID
+    );
+    await this.fileUtils.writeFile(manifestPath, manifestContent);
   }
 }

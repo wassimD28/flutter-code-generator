@@ -7,8 +7,8 @@ export enum ProjectStructure {
   LIB = "lib",
   ROOT = "root",
   ASSETS = "assets",
+  ANDROID = "android",
 }
-
 export class TemplateUtils {
   private baseTemplatesDir: string;
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;

@@ -157,7 +157,7 @@ export class FlutterAppGenerator {
 
     for (const item of items) {
       // Log which file we're generating
-      this.logger.info(`Generating ${item.name}`);
+      this.logger.info(`Generating ${item.name} from path ${item.path}`);
 
       // Determine the appropriate ProjectStructure type
       const structureType = structureTypeCallback
@@ -171,25 +171,30 @@ export class FlutterAppGenerator {
         structureType
       );
 
-      // Write the file
+      // Fix: Write the file directly to the output directory + item path
+      // This ensures we don't add any template folder name to the output path
       const filePath = path.join(outputDir, item.path);
       await this.fileUtils.writeFile(filePath, content);
+
+      this.logger.debug(`Generated file written to: ${filePath}`);
     }
   }
 
   // Helper method to determine the ProjectStructure type based on file path
   private determineProjectStructureType(filePath: string): ProjectStructure {
-    if (filePath.startsWith("android/")) {
+    if (filePath.includes("android/")) {
       return ProjectStructure.ANDROID;
     } else if (filePath === "pubspec.yaml") {
-      // Ensure this exact match works
       return ProjectStructure.ROOT;
-    } else if (filePath.startsWith("assets/")) {
+    } else if (filePath.includes("assets/")) {
       return ProjectStructure.ASSETS;
-    } else if (filePath.startsWith("ios/")) {
+    } else if (filePath.includes("ios/")) {
       return ProjectStructure.IOS;
-    } else {
+    } else if (filePath.includes("lib/")) {
       return ProjectStructure.LIB;
+    } else {
+      // Default to ROOT for any files in the project root
+      return ProjectStructure.ROOT;
     }
   }
 

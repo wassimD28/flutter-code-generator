@@ -12,17 +12,17 @@ export enum ProjectStructure {
 }
 
 export class TemplateUtils {
-  private baseTemplatesDir: string;
+  private templatesDir: string;
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;
 
-  constructor(baseTemplatesDir?: string) {
+  constructor(templatesDir?: string) {
     // If a custom templates dir is provided, use it directly
     // Otherwise, fall back to the default in src/templates
-    this.baseTemplatesDir =
-      baseTemplatesDir || path.join(__dirname, "..", "..", "src", "templates");
+    this.templatesDir =
+      templatesDir || path.join(__dirname, "..", "..", "src", "templates");
 
     // Debug log to confirm the template directory
-    console.log(`[DEBUG] Using templates directory: ${this.baseTemplatesDir}`);
+    console.log(`[DEBUG] Using templates directory: ${this.templatesDir}`);
 
     this.templatesCache = new Map();
 
@@ -76,20 +76,20 @@ export class TemplateUtils {
    * Load a template from file with improved path handling
    */
   async loadTemplate(
-    templateNameOrPath: string,
+    templatePath: string,
     projectStructure: ProjectStructure
   ): Promise<string> {
-    const templatePath = this.resolveTemplatePath(
-      templateNameOrPath,
+    const resolvedPath = this.resolveTemplatePath(
+      templatePath,
       projectStructure
     );
 
     // Debug log to show the resolved template path
     console.log(
-      `[DEBUG] Resolving template: ${templateNameOrPath} to path: ${templatePath}`
+      `[DEBUG] Resolving template: ${templatePath} to path: ${resolvedPath}`
     );
 
-    return await this.readTemplateFile(templatePath);
+    return await this.readTemplateFile(resolvedPath);
   }
 
   /**
@@ -113,17 +113,17 @@ export class TemplateUtils {
    * Compile a template with provided context
    */
   async compileTemplate<T>(
-    templateNameOrPath: string,
+    templatePath: string,
     context: T,
     projectStructure: ProjectStructure = ProjectStructure.LIB
   ): Promise<string> {
-    // Generate a cache key that includes both template name and structure
-    const cacheKey = `${projectStructure}:${templateNameOrPath}`;
+    // Generate a cache key that includes both template path and structure
+    const cacheKey = `${projectStructure}:${templatePath}`;
 
     // Check cache first
     if (!this.templatesCache.has(cacheKey)) {
       const templateSource = await this.loadTemplate(
-        templateNameOrPath,
+        templatePath,
         projectStructure
       );
       this.templatesCache.set(cacheKey, Handlebars.compile(templateSource));
@@ -131,7 +131,7 @@ export class TemplateUtils {
 
     const template = this.templatesCache.get(cacheKey);
     if (!template) {
-      throw new Error(`Template not found: ${templateNameOrPath}`);
+      throw new Error(`Template not found: ${templatePath}`);
     }
 
     return template(context);
@@ -139,86 +139,19 @@ export class TemplateUtils {
 
   /**
    * Resolve the full path to a template file
-   * FIXED: Improved path resolution for different file types
+   * FIXED: Uses project structure paths directly to find HBS files
    */
   resolveTemplatePath(
-    templateNameOrPath: string,
+    filePath: string,
     projectStructure: ProjectStructure
   ): string {
-    // First, clean up the path by removing any leading template folder name
-    // For example, if path is "fashion/android/app/build.gradle.kts"
-    // Extract just "android/app/build.gradle.kts"
-    let cleanPath = templateNameOrPath;
+    // This is the key fix - we look for the .hbs file that matches the path in the project structure
+    // The filePath here should be directly from the projectStructure.*.path property
 
-    // Remove template name prefix if it exists (e.g., "fashion/")
-    if (
-      cleanPath.includes("/") &&
-      !cleanPath.startsWith("lib/") &&
-      !cleanPath.startsWith("android/") &&
-      !cleanPath.startsWith("ios/")
-    ) {
-      cleanPath = cleanPath.substring(cleanPath.indexOf("/") + 1);
-    }
+    // Always add .hbs extension if not already there
+    const hbsExt = filePath.endsWith(".hbs") ? "" : ".hbs";
 
-    // Special case for pubspec.yaml
-    if (cleanPath === "pubspec.yaml") {
-      return path.join(this.baseTemplatesDir, "pubspec.yaml.hbs");
-    }
-
-    // Handle Gradle files (build.gradle, build.gradle.kts, etc.)
-    if (
-      cleanPath.includes("build.gradle") ||
-      cleanPath.includes("gradle.properties") ||
-      cleanPath.includes("settings.gradle")
-    ) {
-      return path.join(this.baseTemplatesDir, cleanPath + ".hbs");
-    }
-
-    // Handle AndroidManifest.xml
-    if (cleanPath.includes("AndroidManifest.xml")) {
-      return path.join(this.baseTemplatesDir, cleanPath + ".hbs");
-    }
-
-    // Handle iOS files
-    if (cleanPath.startsWith("ios/")) {
-      return path.join(this.baseTemplatesDir, cleanPath + ".hbs");
-    }
-
-    // Handle lib files
-    if (cleanPath.startsWith("lib/")) {
-      // Remove "lib/" prefix as it's already part of the template directory structure
-      const libPath = cleanPath.substring(4);
-      return path.join(this.baseTemplatesDir, "lib", libPath + ".hbs");
-    }
-
-    // For paths with directories
-    if (cleanPath.includes("/")) {
-      const filename = path.basename(cleanPath);
-      const dirPath = path.dirname(cleanPath);
-
-      // Determine the correct base directory based on projectStructure
-      if (projectStructure === ProjectStructure.LIB) {
-        return path.join(
-          this.baseTemplatesDir,
-          "lib",
-          dirPath,
-          filename + ".hbs"
-        );
-      } else {
-        return path.join(
-          this.baseTemplatesDir,
-          projectStructure.toString(),
-          dirPath,
-          filename + ".hbs"
-        );
-      }
-    }
-
-    // For simple template names
-    return path.join(
-      this.baseTemplatesDir,
-      projectStructure.toString(),
-      templateNameOrPath
-    );
+    // Resolve the path within the template directory
+    return path.join(this.templatesDir, filePath + hbsExt);
   }
 }

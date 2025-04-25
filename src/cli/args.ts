@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { StoreConfig } from "../models/config";
 
-
 export function parseArgs(): {
   config: StoreConfig;
   outputDir: string;
@@ -80,22 +79,25 @@ export function parseArgs(): {
       }
 
       const structureContent = fs.readFileSync(structurePath, "utf-8");
-      const projectStructure = JSON.parse(structureContent);
+      const structureObj = JSON.parse(structureContent);
 
-      // Log the project structure to debug
+      // Extract the actual project structure - handle the nested structure
+      const projectStructure = structureObj.projectStructure;
+
+      // Log the project structure to debug (improved logging)
       console.log(
         "[DEBUG] Project structure loaded:",
         JSON.stringify({
-          hasEntry: !!projectStructure.entry,
-          entryPath: projectStructure.entry?.path,
-          sections: Object.keys(projectStructure),
+          hasEntry: !!projectStructure?.entry,
+          entryPath: projectStructure?.entry?.path,
+          sections: projectStructure ? Object.keys(projectStructure) : [],
         })
       );
 
       // Merge the project structure into the config
       config = {
         ...config,
-        projectStructure,
+        projectStructure: projectStructure,
       };
 
       // Verify the merged config has the expected structure

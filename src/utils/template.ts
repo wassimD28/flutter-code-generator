@@ -14,8 +14,9 @@ export class TemplateUtils {
   private baseTemplatesDir: string;
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;
 
-  constructor(baseTemplatesDir = path.join(__dirname, "..", "templates")) {
-    this.baseTemplatesDir = baseTemplatesDir;
+  constructor(baseTemplatesDir?: string) {
+    this.baseTemplatesDir =
+      baseTemplatesDir || path.join(__dirname, "..", "templates");
     this.templatesCache = new Map();
 
     // Register Handlebars helpers

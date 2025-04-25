@@ -2,18 +2,20 @@ import fs from "fs";
 import path from "path";
 import { StoreConfig } from "../models/config";
 
-interface CLIArgs {
-  config: string;
+export function parseArgs(): {
+  config: StoreConfig;
   outputDir: string;
-}
-
-export function parseArgs(): { config: StoreConfig; outputDir: string } {
+  templateDir?: string;
+  projectStructureFile?: string;
+} {
   // Use node's process.argv to parse command-line arguments
   const args = process.argv;
 
-  // Look for --config and --output flags anywhere in the arguments
+  // Look for --config, --output, --template, and --structure flags anywhere in the arguments
   let configPath: string | undefined;
   let outputDir: string | undefined;
+  let templateDir: string | undefined;
+  let structureFile: string | undefined;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--config" && i + 1 < args.length) {
@@ -22,20 +24,26 @@ export function parseArgs(): { config: StoreConfig; outputDir: string } {
     if (args[i] === "--output" && i + 1 < args.length) {
       outputDir = args[i + 1];
     }
+    if (args[i] === "--template" && i + 1 < args.length) {
+      templateDir = args[i + 1];
+    }
+    if (args[i] === "--structure" && i + 1 < args.length) {
+      structureFile = args[i + 1];
+    }
   }
 
-  // If the flags aren't found, check if the arguments are directly provided
-  // This supports both forms:
-  // - npm run dev -- --config config.json --output generated-app
-  // - npm run dev config.json generated-app
+  // If the flags aren't found, check for positional arguments
   if (!configPath && args.length > 2) {
-    // Assume the first argument after the script is the config path
     configPath = args[2];
   }
-
   if (!outputDir && args.length > 3) {
-    // Assume the second argument after the script is the output directory
     outputDir = args[3];
+  }
+  if (!templateDir && args.length > 4) {
+    templateDir = args[4];
+  }
+  if (!structureFile && args.length > 5) {
+    structureFile = args[5];
   }
 
   if (!configPath) {
@@ -61,11 +69,32 @@ export function parseArgs(): { config: StoreConfig; outputDir: string } {
 
     // Read and parse the configuration file
     const rawConfig = fs.readFileSync(resolvedConfigPath, "utf-8");
-    const config: StoreConfig = JSON.parse(rawConfig);
+    let config: StoreConfig = JSON.parse(rawConfig);
+
+    // If a project structure file is specified, merge it with the config
+    if (structureFile) {
+      const structurePath = path.resolve(process.cwd(), structureFile);
+      if (!fs.existsSync(structurePath)) {
+        throw new Error(`Project structure file not found: ${structurePath}`);
+      }
+
+      const structureContent = fs.readFileSync(structurePath, "utf-8");
+      const projectStructure = JSON.parse(structureContent);
+
+      // Merge the project structure into the config
+      config = {
+        ...config,
+        projectStructure,
+      };
+    }
 
     return {
       config,
       outputDir: path.resolve(process.cwd(), outputDir),
+      templateDir: templateDir
+        ? path.resolve(process.cwd(), templateDir)
+        : undefined,
+      projectStructureFile: structureFile,
     };
   } catch (error) {
     throw new Error(

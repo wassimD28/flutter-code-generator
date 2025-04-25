@@ -11,9 +11,9 @@ export class FlutterAppGenerator {
   private imageUtils: ImageUtils;
   private logger: Logger;
 
-  constructor(logger: Logger) {
+  constructor(logger: Logger, templatesDir?: string) {
     this.fileUtils = new FileUtils();
-    this.templateUtils = new TemplateUtils();
+    this.templateUtils = new TemplateUtils(templatesDir); // Pass the template directory
     this.imageUtils = new ImageUtils();
     this.logger = logger;
   }

@@ -8,7 +8,17 @@ async function main(): Promise<void> {
 
   try {
     // Parse command line arguments
-    const { config, outputDir } = parseArgs();
+    const { config, outputDir, templateDir, projectStructureFile } =
+      parseArgs();
+
+    // Log what's being used
+    logger.info(`Using config: ${JSON.stringify(config.metadata)}`);
+    if (projectStructureFile) {
+      logger.info(`Using project structure from: ${projectStructureFile}`);
+    }
+    if (templateDir) {
+      logger.info(`Using templates from: ${templateDir}`);
+    }
 
     // Validate configuration
     const validator = new ConfigValidator();
@@ -22,7 +32,7 @@ async function main(): Promise<void> {
     }
 
     // Generate the app
-    const generator = new FlutterAppGenerator(logger);
+    const generator = new FlutterAppGenerator(logger, templateDir);
     await generator.generateApp(config, outputDir);
 
     logger.success("App generation completed successfully!");

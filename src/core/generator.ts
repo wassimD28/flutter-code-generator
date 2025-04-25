@@ -142,7 +142,7 @@ export class FlutterAppGenerator {
       structure.project_config,
       config,
       outputDir,
-      this.determineProjectStructureType
+      (path) => this.determineProjectStructureType(path) // Pass the method properly
     );
   }
 
@@ -182,9 +182,12 @@ export class FlutterAppGenerator {
     if (filePath.startsWith("android/")) {
       return ProjectStructure.ANDROID;
     } else if (filePath === "pubspec.yaml") {
+      // Ensure this exact match works
       return ProjectStructure.ROOT;
     } else if (filePath.startsWith("assets/")) {
       return ProjectStructure.ASSETS;
+    } else if (filePath.startsWith("ios/")) {
+      return ProjectStructure.IOS;
     } else {
       return ProjectStructure.LIB;
     }

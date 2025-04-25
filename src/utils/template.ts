@@ -88,7 +88,11 @@ export class TemplateUtils {
     projectStructure: ProjectStructure
   ): Promise<string> {
     let templatePath = "unknown";
-
+    // Special case for pubspec.yaml
+    if (templateNameOrPath === "pubspec.yaml") {
+      templatePath = path.join(this.baseTemplatesDir, "pubspec.yaml.hbs");
+      return await this.readTemplateFile(templatePath);
+    }
     // Determine the correct template directory based on the file path and structure
     let templateDir = "";
     let templateFilename = "";

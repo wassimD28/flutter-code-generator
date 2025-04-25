@@ -15,8 +15,14 @@ export class TemplateUtils {
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;
 
   constructor(baseTemplatesDir?: string) {
+    // FIXED: If a custom templates dir is provided, use it directly
+    // Otherwise, fall back to the default in src/templates
     this.baseTemplatesDir =
-      baseTemplatesDir || path.join(__dirname, "..", "templates");
+      baseTemplatesDir || path.join(__dirname, "..", "..", "src", "templates");
+
+    // Debug log to confirm the template directory
+    console.log(`[DEBUG] Using templates directory: ${this.baseTemplatesDir}`);
+
     this.templatesCache = new Map();
 
     // Register Handlebars helpers
@@ -92,6 +98,12 @@ export class TemplateUtils {
       templateNameOrPath,
       projectStructure
     );
+
+    // Debug log to show the resolved template path
+    console.log(
+      `[DEBUG] Resolving template: ${templateNameOrPath} to path: ${templatePath}`
+    );
+
     return await this.readTemplateFile(templatePath);
   }
 
@@ -105,8 +117,9 @@ export class TemplateUtils {
       const templateContent = await fs.readFile(templatePath, "utf-8");
       return templateContent;
     } catch (error) {
+      // Enhanced error message with more debugging info
       throw new Error(
-        `Template not found at path: ${templatePath}. Please ensure the template exists before running the generator.`
+        `Template not found at path: ${templatePath}. Please ensure the template exists before running the generator. Current working directory: ${process.cwd()}`
       );
     }
   }
@@ -146,8 +159,6 @@ export class TemplateUtils {
     templateNameOrPath: string,
     projectStructure: ProjectStructure
   ): string {
-    let templatePath: string;
-
     // Special case for pubspec.yaml
     if (templateNameOrPath === "pubspec.yaml") {
       return path.join(this.baseTemplatesDir, "pubspec.yaml.hbs");
@@ -214,13 +225,22 @@ export class TemplateUtils {
       // Extract the directory part of the path
       const dirPath = path.dirname(relativePath);
 
-      // Construct the full template path
-      return path.join(
-        this.baseTemplatesDir,
-        projectStructure.toString(),
-        dirPath,
-        templateFilename
-      );
+      // Construct the full template path based on projectStructure
+      if (projectStructure === ProjectStructure.LIB) {
+        return path.join(
+          this.baseTemplatesDir,
+          "lib",
+          dirPath,
+          templateFilename
+        );
+      } else {
+        return path.join(
+          this.baseTemplatesDir,
+          projectStructure.toString(),
+          dirPath,
+          templateFilename
+        );
+      }
     } else {
       // This is just a template name like "main.dart.hbs"
       return path.join(

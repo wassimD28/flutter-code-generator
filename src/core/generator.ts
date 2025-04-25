@@ -230,7 +230,7 @@ export class FlutterAppGenerator {
       bindings: [],
       screens: [],
       widgets: [],
-      project_config: [], // Add this for the new category
+      project_config: [],
       other: [],
     };
 
@@ -246,8 +246,14 @@ export class FlutterAppGenerator {
           // Determine the appropriate ProjectStructure type
           const structureType = this.determineProjectStructureType(item.path);
 
-          // Pass the full path from config directly to loadTemplate
-          await this.templateUtils.loadTemplate(item.path, structureType);
+          // Check if the template file exists in the specified template directory
+          const templatePath = this.templateUtils.resolveTemplatePath(
+            item.path,
+            structureType
+          );
+
+          // Try to access the file to verify it exists
+          await this.fileUtils.fileExists(templatePath);
         } catch (error) {
           // Add to the appropriate category
           const filename = path.basename(item.path);
@@ -258,18 +264,28 @@ export class FlutterAppGenerator {
           } else {
             missingTemplates.other.push(templateName);
           }
+
+          // Log the actual path we're trying to access for debugging
+          this.logger.debug(`Failed to find template: ${item.path}`);
         }
       }
     };
 
     // Check main entry template
     try {
-      await this.templateUtils.loadTemplate(
-        config.projectStructure.entry.path,
-        ProjectStructure.LIB
+      const entryTemplateType = this.determineProjectStructureType(
+        config.projectStructure.entry.path
       );
+      const entryTemplatePath = this.templateUtils.resolveTemplatePath(
+        config.projectStructure.entry.path,
+        entryTemplateType
+      );
+      await this.fileUtils.fileExists(entryTemplatePath);
     } catch (error) {
       missingTemplates.core.push("main.dart.hbs");
+      this.logger.debug(
+        `Failed to find entry template: ${config.projectStructure.entry.path}`
+      );
     }
 
     // Check templates for each section, mapping to the appropriate category

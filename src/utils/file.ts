@@ -50,4 +50,15 @@ export class FileUtils {
     await scanDir(dir);
     return files;
   }
+  /**
+   * Check if a file exists
+   */
+  async fileExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }

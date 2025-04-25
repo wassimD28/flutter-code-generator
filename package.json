@@ -9,7 +9,9 @@
     "dev": "ts-node src/index.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
-    "generate": "ts-node src/index.ts config.json generated-app"
+    "generate": "ts-node src/index.ts config.json generated-app",
+    "scan:help": "ts-node scripts/ts/template-scanner.ts --help",
+    "scan:fashion": "ts-node scripts/ts/template-scanner.ts --input src/templates --output project-structure/fashion.json"
   },
   "keywords": [
     "flutter",

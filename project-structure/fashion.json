@@ -1,0 +1,1029 @@
+{
+  "projectStructure": {
+    "core": [
+      {
+        "name": "App Config",
+        "path": "lib/app/core/config/app_config.dart"
+      },
+      {
+        "name": "App Notification Type",
+        "path": "lib/app/core/config/app_notification_type.dart"
+      },
+      {
+        "name": "Assets Config",
+        "path": "lib/app/core/config/assets_config.dart"
+      },
+      {
+        "name": "Main Routes",
+        "path": "lib/app/core/config/main_routes.dart"
+      },
+      {
+        "name": "Routes Config",
+        "path": "lib/app/core/config/routes_config.dart"
+      },
+      {
+        "name": "Translation Extension",
+        "path": "lib/app/core/localization/translation_extension.dart"
+      },
+      {
+        "name": "Auth Middleware",
+        "path": "lib/app/core/middlewares/auth_middleware.dart"
+      },
+      {
+        "name": "Activity Detector",
+        "path": "lib/app/core/services/activity_detector.dart"
+      },
+      {
+        "name": "API Client",
+        "path": "lib/app/core/services/api_client.dart"
+      },
+      {
+        "name": "Enhanced Image Cache",
+        "path": "lib/app/core/services/enhanced_image_cache.dart"
+      },
+      {
+        "name": "Image Preloader Manager",
+        "path": "lib/app/core/services/image_preloader_manager.dart"
+      },
+      {
+        "name": "UI Config",
+        "path": "lib/app/core/theme/ui_config.dart"
+      },
+      {
+        "name": "Alert Exit App",
+        "path": "lib/app/core/utils/alert_exit_app.dart"
+      },
+      {
+        "name": "Checkinternet",
+        "path": "lib/app/core/utils/checkinternet.dart"
+      },
+      {
+        "name": "Handelingdata",
+        "path": "lib/app/core/utils/handelingdata.dart"
+      },
+      {
+        "name": "Valid Input",
+        "path": "lib/app/core/utils/valid_input.dart"
+      },
+      {
+        "name": "Validated Fields",
+        "path": "lib/app/shared/extensions/fields/validated_fields.dart"
+      },
+      {
+        "name": "Full Width Extension",
+        "path": "lib/app/shared/extensions/full_width_extension.dart"
+      },
+      {
+        "name": "Text Extensions",
+        "path": "lib/app/shared/extensions/text_extensions.dart"
+      },
+      {
+        "name": "Bottom Nav Bar",
+        "path": "lib/app/shared/widgets/bottom_nav_bar.dart"
+      },
+      {
+        "name": "Rating Stars",
+        "path": "lib/app/shared/widgets/rating_stars.dart"
+      },
+      {
+        "name": "Universal Cached Image",
+        "path": "lib/app/shared/widgets/universal_cached_image.dart"
+      },
+      {
+        "name": "Auth Email Reset Password",
+        "path": "lib/features/auth/controllers/email_reset_password.dart"
+      },
+      {
+        "name": "Auth Forget Password",
+        "path": "lib/features/auth/controllers/forget_password.dart"
+      },
+      {
+        "name": "Auth Reset Password",
+        "path": "lib/features/auth/controllers/reset_password.dart"
+      },
+      {
+        "name": "Auth API Client",
+        "path": "lib/features/auth/services/auth_api_client.dart"
+      },
+      {
+        "name": "Auth Error Handler",
+        "path": "lib/features/auth/services/auth_error_handler.dart"
+      },
+      {
+        "name": "Auth Token Manager",
+        "path": "lib/features/auth/services/token_manager.dart"
+      },
+      {
+        "name": "Auth Custom Text Title",
+        "path": "lib/features/auth/views/widgets/custom_text_title.dart"
+      },
+      {
+        "name": "Cart Item Card",
+        "path": "lib/features/cart/views/widgets/cart_item_card.dart"
+      },
+      {
+        "name": "Cart Summary",
+        "path": "lib/features/cart/views/widgets/cart_summary.dart"
+      },
+      {
+        "name": "Cart Coupon Field",
+        "path": "lib/features/cart/views/widgets/coupon_field.dart"
+      },
+      {
+        "name": "Category Tile",
+        "path": "lib/features/category/views/widgets/category_tile.dart"
+      },
+      {
+        "name": "Home Product Image",
+        "path": "lib/features/home/views/widgets/card_comps/product_image.dart"
+      },
+      {
+        "name": "Home Category Filter",
+        "path": "lib/features/home/views/widgets/category_filter.dart"
+      },
+      {
+        "name": "Home Custom App Bar",
+        "path": "lib/features/home/views/widgets/custom_app_bar.dart"
+      },
+      {
+        "name": "Home Product Card",
+        "path": "lib/features/home/views/widgets/product_card.dart"
+      },
+      {
+        "name": "Home Product Grid",
+        "path": "lib/features/home/views/widgets/product_grid.dart"
+      },
+      {
+        "name": "Home Search Bar",
+        "path": "lib/features/home/views/widgets/search_bar.dart"
+      },
+      {
+        "name": "Home Section Header",
+        "path": "lib/features/home/views/widgets/section_header.dart"
+      },
+      {
+        "name": "Home Skeleton Loaders",
+        "path": "lib/features/home/views/widgets/skeleton_loaders.dart"
+      },
+      {
+        "name": "Language Card",
+        "path": "lib/features/language/views/widgets/language_card.dart"
+      },
+      {
+        "name": "Notifications Empty Notification State.dart",
+        "path": "lib/features/notifications/views/widgets/empty_notification_state.dart.dart"
+      },
+      {
+        "name": "Notifications Notification Item",
+        "path": "lib/features/notifications/views/widgets/notification_item.dart"
+      },
+      {
+        "name": "Product Detail State",
+        "path": "lib/features/product/state/product_detail_state.dart"
+      },
+      {
+        "name": "Product List State",
+        "path": "lib/features/product/state/product_list_state.dart"
+      },
+      {
+        "name": "Product Color Selector",
+        "path": "lib/features/product/views/widgets/product_detail/color_selector.dart"
+      },
+      {
+        "name": "Product Draggable Info Sheet",
+        "path": "lib/features/product/views/widgets/product_detail/draggable_info_sheet.dart"
+      },
+      {
+        "name": "Product Image Gallery",
+        "path": "lib/features/product/views/widgets/product_detail/image_gallery.dart"
+      },
+      {
+        "name": "Product Description",
+        "path": "lib/features/product/views/widgets/product_detail/product_description.dart"
+      },
+      {
+        "name": "Product Image Gallery",
+        "path": "lib/features/product/views/widgets/product_detail/product_image_gallery.dart"
+      },
+      {
+        "name": "Product Info",
+        "path": "lib/features/product/views/widgets/product_detail/product_info.dart"
+      },
+      {
+        "name": "Product Quantity Selector",
+        "path": "lib/features/product/views/widgets/product_detail/quantity_selector.dart"
+      },
+      {
+        "name": "Product Size Selector",
+        "path": "lib/features/product/views/widgets/product_detail/size_selector.dart"
+      },
+      {
+        "name": "Product Top Navigation Bar",
+        "path": "lib/features/product/views/widgets/product_detail/top_navigation_bar.dart"
+      },
+      {
+        "name": "Profile Custom Dropdown Field",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/custom_dropdown_field.dart"
+      },
+      {
+        "name": "Profile Custom Form Field",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/custom_form_field.dart"
+      },
+      {
+        "name": "Profile Dropdown Row",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/dropdown_row.dart"
+      },
+      {
+        "name": "Profile Phone Field",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/phone_field.dart"
+      },
+      {
+        "name": "Profile Form",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/profile_form.dart"
+      },
+      {
+        "name": "Profile Header",
+        "path": "lib/features/profile/views/widgets/profile_main_widgets/profile_header.dart"
+      },
+      {
+        "name": "Profile Menu Item",
+        "path": "lib/features/profile/views/widgets/profile_main_widgets/profile_menu_item.dart"
+      },
+      {
+        "name": "Profile Menu Section",
+        "path": "lib/features/profile/views/widgets/profile_main_widgets/profile_menu_section.dart"
+      },
+      {
+        "name": "Profile User Details Card",
+        "path": "lib/features/profile/views/widgets/profile_main_widgets/user_details_card.dart"
+      },
+      {
+        "name": "No Search Result",
+        "path": "lib/features/search/no_search_result.dart"
+      },
+      {
+        "name": "Main",
+        "path": "lib/main.dart"
+      }
+    ],
+    "services": [
+      {
+        "name": "Localization Service",
+        "path": "lib/app/core/localization/localization_service.dart"
+      },
+      {
+        "name": "Pusher Service",
+        "path": "lib/app/core/services/pusher_service.dart"
+      },
+      {
+        "name": "Storage Service",
+        "path": "lib/app/core/services/storage_service.dart"
+      },
+      {
+        "name": "Service Locator",
+        "path": "lib/app/di/service_locator.dart"
+      },
+      {
+        "name": "Auth Service",
+        "path": "lib/features/auth/services/auth_service.dart"
+      },
+      {
+        "name": "Auth Notification Service",
+        "path": "lib/features/auth/services/notification_service.dart"
+      },
+      {
+        "name": "Profile User API Service",
+        "path": "lib/features/profile/services/user_api_service.dart"
+      }
+    ],
+    "theme": [
+      {
+        "name": "App Colors Data",
+        "path": "lib/app/core/theme/app_colors_data.dart"
+      },
+      {
+        "name": "App Color Extension",
+        "path": "lib/app/core/theme/app_color_extension.dart"
+      },
+      {
+        "name": "App Color Utils",
+        "path": "lib/app/core/theme/app_color_utils.dart"
+      },
+      {
+        "name": "App Theme",
+        "path": "lib/app/core/theme/app_theme.dart"
+      },
+      {
+        "name": "App Theme Colors",
+        "path": "lib/app/core/theme/app_theme_colors.dart"
+      },
+      {
+        "name": "App Typography",
+        "path": "lib/app/core/theme/app_typography.dart"
+      },
+      {
+        "name": "App Typography Extension",
+        "path": "lib/app/core/theme/app_typography_extension.dart"
+      },
+      {
+        "name": "Colors",
+        "path": "lib/app/core/theme/colors.dart"
+      },
+      {
+        "name": "Theme Aware Svg",
+        "path": "lib/app/shared/widgets/theme_aware_svg.dart"
+      },
+      {
+        "name": "Theme Toggle",
+        "path": "lib/app/shared/widgets/theme_toggle.dart"
+      }
+    ],
+    "utils": [
+      {
+        "name": "Auth Jwt Utils",
+        "path": "lib/features/auth/services/jwt_utils.dart"
+      }
+    ],
+    "dependency_injection": [
+      {
+        "name": "Onboarding Static",
+        "path": "lib/app/core/data/onboarding_static.dart"
+      },
+      {
+        "name": "Initializer",
+        "path": "lib/app/di/initializer.dart"
+      },
+      {
+        "name": "Lifecycle Observer",
+        "path": "lib/app/di/lifecycle_observer.dart"
+      },
+      {
+        "name": "Home Price Display",
+        "path": "lib/features/home/views/widgets/card_comps/price_display.dart"
+      },
+      {
+        "name": "On Boarding Onboarding Bg Icon",
+        "path": "lib/features/onBoarding/views/widgets/onboarding_bg_icon.dart"
+      },
+      {
+        "name": "On Boarding Onboarding Carousel Image",
+        "path": "lib/features/onBoarding/views/widgets/onboarding_carousel_image.dart"
+      },
+      {
+        "name": "Profile Name Display",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/profile_name_display.dart"
+      },
+      {
+        "name": "Profile Logout Dialog",
+        "path": "lib/features/profile/views/widgets/profile_main_widgets/logout_dialog.dart"
+      }
+    ],
+    "shared_controllers": [
+      {
+        "name": "Controller Form Field State",
+        "path": "lib/app/shared/controllers/controller_form_field_state.dart"
+      },
+      {
+        "name": "Navigation Controller",
+        "path": "lib/app/shared/controllers/navigation_controller.dart"
+      },
+      {
+        "name": "Theme Controller",
+        "path": "lib/app/shared/controllers/theme_controller.dart"
+      }
+    ],
+    "shared_widgets": [],
+    "button_components": [
+      {
+        "name": "Danger Button",
+        "path": "lib/app/shared/extensions/buttons/danger_button.dart"
+      },
+      {
+        "name": "Outlined Button",
+        "path": "lib/app/shared/extensions/buttons/outlined_button.dart"
+      },
+      {
+        "name": "Primary Button",
+        "path": "lib/app/shared/extensions/buttons/primary_button.dart"
+      },
+      {
+        "name": "Primary Icon Text Button",
+        "path": "lib/app/shared/extensions/buttons/primary_icon_text_button.dart"
+      },
+      {
+        "name": "Secondary Button",
+        "path": "lib/app/shared/extensions/buttons/secondary_button.dart"
+      },
+      {
+        "name": "Secondary Icon Text Button",
+        "path": "lib/app/shared/extensions/buttons/secondary_icon_text_button.dart"
+      },
+      {
+        "name": "Text Button",
+        "path": "lib/app/shared/extensions/buttons/text_button.dart"
+      },
+      {
+        "name": "Custom Auth Button",
+        "path": "lib/features/auth/views/widgets/custom_auth_button.dart"
+      },
+      {
+        "name": "Home Favorite Button",
+        "path": "lib/features/home/views/widgets/card_comps/favorite_button.dart"
+      },
+      {
+        "name": "Product Add To Cart Button",
+        "path": "lib/features/product/views/widgets/product_detail/add_to_cart_button.dart"
+      },
+      {
+        "name": "Product Favorite Button",
+        "path": "lib/features/product/views/widgets/product_detail/favorite_button.dart"
+      },
+      {
+        "name": "Profile Save Button",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/save_button.dart"
+      }
+    ],
+    "controllers": [
+      {
+        "name": "Address Controller",
+        "path": "lib/features/address/controller/address_controller.dart"
+      },
+      {
+        "name": "Auth Login Controller",
+        "path": "lib/features/auth/controllers/login_controller.dart"
+      },
+      {
+        "name": "Auth Signup Controller",
+        "path": "lib/features/auth/controllers/signup_controller.dart"
+      },
+      {
+        "name": "Cart Controller",
+        "path": "lib/features/cart/controllers/cart_controller.dart"
+      },
+      {
+        "name": "Category Controller",
+        "path": "lib/features/category/controllers/category_controller.dart"
+      },
+      {
+        "name": "Category Product Controller",
+        "path": "lib/features/category_product/controller/category_product_controller.dart"
+      },
+      {
+        "name": "Product Filter Controller",
+        "path": "lib/features/filter/controllers/product_filter_controller.dart"
+      },
+      {
+        "name": "Home Controller",
+        "path": "lib/features/home/controllers/home_controller.dart"
+      },
+      {
+        "name": "Language Controller",
+        "path": "lib/features/language/controllers/language_controller.dart"
+      },
+      {
+        "name": "Notifications Notification Controller",
+        "path": "lib/features/notifications/controller/notification_controller.dart"
+      },
+      {
+        "name": "On Boarding Onboarding Controller",
+        "path": "lib/features/onBoarding/controllers/onboarding_controller.dart"
+      },
+      {
+        "name": "On Boarding Profile Setup Controller",
+        "path": "lib/features/onBoarding/controllers/profile_setup_controller.dart"
+      },
+      {
+        "name": "Order Controller",
+        "path": "lib/features/order/controller/order_controller.dart"
+      },
+      {
+        "name": "Payment Controller",
+        "path": "lib/features/payment/controller/payment_controller.dart"
+      },
+      {
+        "name": "Product Favorite Controller",
+        "path": "lib/features/product/controllers/favorite_controller.dart"
+      },
+      {
+        "name": "Product Controller",
+        "path": "lib/features/product/controllers/product_controller.dart"
+      },
+      {
+        "name": "Product Detail Controller",
+        "path": "lib/features/product/controllers/product_detail_controller.dart"
+      },
+      {
+        "name": "Product List Controller",
+        "path": "lib/features/product/controllers/product_list_controller.dart"
+      },
+      {
+        "name": "Edit Profile Controller",
+        "path": "lib/features/profile/controllers/edit_profile_controller.dart"
+      },
+      {
+        "name": "Profile Controller",
+        "path": "lib/features/profile/controllers/profile_controller.dart"
+      },
+      {
+        "name": "Review Controller",
+        "path": "lib/features/review/controllers/review_controller.dart"
+      },
+      {
+        "name": "Subcategory Controller",
+        "path": "lib/features/subcategory/controllers/subcategory_controller.dart"
+      },
+      {
+        "name": "Wishlist Controller",
+        "path": "lib/features/wishlist/controllers/wishlist_controller.dart"
+      }
+    ],
+    "models": [
+      {
+        "name": "Address Model",
+        "path": "lib/features/address/model/address_model.dart"
+      },
+      {
+        "name": "Cart Model",
+        "path": "lib/features/cart/models/cart_model.dart"
+      },
+      {
+        "name": "Category.model",
+        "path": "lib/features/category/models/category.model.dart"
+      },
+      {
+        "name": "Home Color Variant Model",
+        "path": "lib/features/home/models/color_variant_model.dart"
+      },
+      {
+        "name": "Home Size Variant Model",
+        "path": "lib/features/home/models/size_variant_model.dart"
+      },
+      {
+        "name": "Notifications Notification Model",
+        "path": "lib/features/notifications/model/notification_model.dart"
+      },
+      {
+        "name": "On Boarding Onboarding Model",
+        "path": "lib/features/onBoarding/models/onboarding_model.dart"
+      },
+      {
+        "name": "Order Model",
+        "path": "lib/features/order/model/order_model.dart"
+      },
+      {
+        "name": "Product Model",
+        "path": "lib/features/product/models/product_model.dart"
+      },
+      {
+        "name": "Profile User Model",
+        "path": "lib/features/profile/models/user_model.dart"
+      },
+      {
+        "name": "Review Model",
+        "path": "lib/features/review/model/review_model.dart"
+      },
+      {
+        "name": "Subcategory Model",
+        "path": "lib/features/subcategory/models/subcategory_model.dart"
+      },
+      {
+        "name": "Wishlist Item Model",
+        "path": "lib/features/wishlist/models/wishlist_item_model.dart"
+      }
+    ],
+    "repositories": [
+      {
+        "name": "Address Repository",
+        "path": "lib/features/address/repository/address_repository.dart"
+      },
+      {
+        "name": "Cart Repository",
+        "path": "lib/features/cart/repositories/cart_repository.dart"
+      },
+      {
+        "name": "Category Repository",
+        "path": "lib/features/category/repositories/category_repository.dart"
+      },
+      {
+        "name": "Order Repository",
+        "path": "lib/features/order/repositories/order_repository.dart"
+      },
+      {
+        "name": "Payment Repository",
+        "path": "lib/features/payment/repositories/payment_repository.dart"
+      },
+      {
+        "name": "Product Repository",
+        "path": "lib/features/product/repositories/product_repository.dart"
+      },
+      {
+        "name": "Profile Repository",
+        "path": "lib/features/profile/repositories/profile_repository.dart"
+      },
+      {
+        "name": "Review Repository",
+        "path": "lib/features/review/repositories/review_repository.dart"
+      },
+      {
+        "name": "Subcategory Repository",
+        "path": "lib/features/subcategory/repositories/subcategory_repository.dart"
+      },
+      {
+        "name": "Wishlist Repository",
+        "path": "lib/features/wishlist/repositories/wishlist_repository.dart"
+      }
+    ],
+    "bindings": [
+      {
+        "name": "Auth Binding",
+        "path": "lib/features/auth/binding/auth_binding.dart"
+      },
+      {
+        "name": "Cart Binding",
+        "path": "lib/features/cart/binding/cart_binding.dart"
+      },
+      {
+        "name": "Category Binding",
+        "path": "lib/features/category/binding/category_binding.dart"
+      },
+      {
+        "name": "Category Product Binding",
+        "path": "lib/features/category_product/binding/category_product_binding.dart"
+      },
+      {
+        "name": "Home Binding",
+        "path": "lib/features/home/binding/home_binding.dart"
+      },
+      {
+        "name": "Language Binding",
+        "path": "lib/features/language/language_binding.dart"
+      },
+      {
+        "name": "Order Binding",
+        "path": "lib/features/order/binding/order_binding.dart"
+      },
+      {
+        "name": "Product Binding",
+        "path": "lib/features/product/binding/product_binding.dart"
+      },
+      {
+        "name": "Edit Profile Binding",
+        "path": "lib/features/profile/bindings/edit_profile_binding.dart"
+      },
+      {
+        "name": "Profile Binding",
+        "path": "lib/features/profile/bindings/profile_binding.dart"
+      },
+      {
+        "name": "Review Binding",
+        "path": "lib/features/review/binding/review_binding.dart"
+      },
+      {
+        "name": "Wishlist Binding",
+        "path": "lib/features/wishlist/binding/wishlist_binding.dart"
+      }
+    ],
+    "screens": [
+      {
+        "name": "Main Container Screen",
+        "path": "lib/app/shared/layouts/main_container_screen.dart"
+      },
+      {
+        "name": "Splash Screen",
+        "path": "lib/app/shared/screens/splash_screen.dart"
+      },
+      {
+        "name": "Address Screen",
+        "path": "lib/features/address/view/address_screen.dart"
+      },
+      {
+        "name": "Add Address",
+        "path": "lib/features/address/view/add_address.dart"
+      },
+      {
+        "name": "Edit Address Page",
+        "path": "lib/features/address/view/edit_address_page.dart"
+      },
+      {
+        "name": "Auth Email Confirmation Screen",
+        "path": "lib/features/auth/views/screen/email_confirmation_screen.dart"
+      },
+      {
+        "name": "Auth Forget Password Screen",
+        "path": "lib/features/auth/views/screen/forget_password_screen.dart"
+      },
+      {
+        "name": "Auth Login Screen",
+        "path": "lib/features/auth/views/screen/login_screen.dart"
+      },
+      {
+        "name": "Auth Reset Password Screen",
+        "path": "lib/features/auth/views/screen/reset_password_screen.dart"
+      },
+      {
+        "name": "Auth Signup Screen",
+        "path": "lib/features/auth/views/screen/signup_screen.dart"
+      },
+      {
+        "name": "Cart Screen",
+        "path": "lib/features/cart/views/screen/cart_screen.dart"
+      },
+      {
+        "name": "Cart Checkout Screen",
+        "path": "lib/features/cart/views/screen/checkout_screen.dart"
+      },
+      {
+        "name": "Category Screen",
+        "path": "lib/features/category/views/category_screen.dart"
+      },
+      {
+        "name": "Category Products Screen",
+        "path": "lib/features/category_product/view/screen/category_products_screen.dart"
+      },
+      {
+        "name": "Category Product Category List View",
+        "path": "lib/features/category_product/view/widgets/category_list_view.dart"
+      },
+      {
+        "name": "Category Product Subcategory List View",
+        "path": "lib/features/category_product/view/widgets/subcategory_list_view.dart"
+      },
+      {
+        "name": "Filter Product Screen",
+        "path": "lib/features/filter/view/screen/filter_product_screen.dart"
+      },
+      {
+        "name": "Filter Apply Button",
+        "path": "lib/features/filter/view/widgets/apply_button.dart"
+      },
+      {
+        "name": "Filter Category Button",
+        "path": "lib/features/filter/view/widgets/category_button.dart"
+      },
+      {
+        "name": "Filter Category Section",
+        "path": "lib/features/filter/view/widgets/category_section.dart"
+      },
+      {
+        "name": "Filter Custom Thumb Shape",
+        "path": "lib/features/filter/view/widgets/custom_thumb_shape.dart"
+      },
+      {
+        "name": "Filter Header",
+        "path": "lib/features/filter/view/widgets/filter_header.dart"
+      },
+      {
+        "name": "Filter Price Range Section",
+        "path": "lib/features/filter/view/widgets/price_range_section.dart"
+      },
+      {
+        "name": "Filter Rating Row",
+        "path": "lib/features/filter/view/widgets/rating_row.dart"
+      },
+      {
+        "name": "Filter Rating Section",
+        "path": "lib/features/filter/view/widgets/rating_section.dart"
+      },
+      {
+        "name": "Filter Sort Section",
+        "path": "lib/features/filter/view/widgets/sort_section.dart"
+      },
+      {
+        "name": "Filter Sort Tab",
+        "path": "lib/features/filter/view/widgets/sort_tab.dart"
+      },
+      {
+        "name": "Home Screen",
+        "path": "lib/features/home/views/screen/home_screen.dart"
+      },
+      {
+        "name": "Language Screen",
+        "path": "lib/features/language/views/language_screen.dart"
+      },
+      {
+        "name": "Notifications Notification Screen",
+        "path": "lib/features/notifications/views/notification_screen.dart"
+      },
+      {
+        "name": "On Boarding Onboarding Screen",
+        "path": "lib/features/onBoarding/views/onboarding_screen.dart"
+      },
+      {
+        "name": "On Boarding Profile Setup Screen",
+        "path": "lib/features/onBoarding/views/profile_setup_screen.dart"
+      },
+      {
+        "name": "Orders Screen",
+        "path": "lib/features/order/view/screen/orders_screen.dart"
+      },
+      {
+        "name": "Empty Order State",
+        "path": "lib/features/order/view/widget/empty_order_state.dart"
+      },
+      {
+        "name": "Order Error View",
+        "path": "lib/features/order/view/widget/error_view.dart"
+      },
+      {
+        "name": "Orders Details Screen",
+        "path": "lib/features/order/view/widget/orders_details_screen.dart"
+      },
+      {
+        "name": "Order Item",
+        "path": "lib/features/order/view/widget/order_item.dart"
+      },
+      {
+        "name": "Order List",
+        "path": "lib/features/order/view/widget/order_list.dart"
+      },
+      {
+        "name": "Order Status Tabs",
+        "path": "lib/features/order/view/widget/order_status_tabs.dart"
+      },
+      {
+        "name": "Order Status Color Helper",
+        "path": "lib/features/order/view/widget/status_color_helper.dart"
+      },
+      {
+        "name": "Order Status Tab",
+        "path": "lib/features/order/view/widget/status_tab.dart"
+      },
+      {
+        "name": "Payment Add Paypal",
+        "path": "lib/features/payment/view/add_paypal.dart"
+      },
+      {
+        "name": "Edit Payment",
+        "path": "lib/features/payment/view/edit_payment.dart"
+      },
+      {
+        "name": "Payment Screen",
+        "path": "lib/features/payment/view/screen/payment_screen.dart"
+      },
+      {
+        "name": "Payment Add Card Screen",
+        "path": "lib/features/payment/view/widget/add_card_screen.dart"
+      },
+      {
+        "name": "Payment Add Paument Methode",
+        "path": "lib/features/payment/view/widget/add_paument_methode.dart"
+      },
+      {
+        "name": "Add Payment",
+        "path": "lib/features/payment/view/widget/add_payment.dart"
+      },
+      {
+        "name": "Payment Add Paypal",
+        "path": "lib/features/payment/view/widget/add_paypal.dart"
+      },
+      {
+        "name": "Edit Payment",
+        "path": "lib/features/payment/view/widget/edit_payment.dart"
+      },
+      {
+        "name": "Payment Item",
+        "path": "lib/features/payment/view/widget/payment_item.dart"
+      },
+      {
+        "name": "Product Detail Screen",
+        "path": "lib/features/product/views/screens/product_detail_screen.dart"
+      },
+      {
+        "name": "Product List Screen",
+        "path": "lib/features/product/views/screens/product_list_screen.dart"
+      },
+      {
+        "name": "Product Image Page Indicator",
+        "path": "lib/features/product/views/widgets/product_detail/image_page_indicator.dart"
+      },
+      {
+        "name": "Edit Profile Screen",
+        "path": "lib/features/profile/views/screens/edit_profile_screen.dart"
+      },
+      {
+        "name": "Profile Screen",
+        "path": "lib/features/profile/views/screens/profile_screen.dart"
+      },
+      {
+        "name": "Review Screen",
+        "path": "lib/features/review/view/screen/review_screen.dart"
+      },
+      {
+        "name": "Edit Review Form",
+        "path": "lib/features/review/view/widgets/edit_review_form.dart"
+      },
+      {
+        "name": "Review Empty State",
+        "path": "lib/features/review/view/widgets/empty_state.dart"
+      },
+      {
+        "name": "Review No Filter Results State",
+        "path": "lib/features/review/view/widgets/no_filter_results_state.dart"
+      },
+      {
+        "name": "Review Quick Tag",
+        "path": "lib/features/review/view/widgets/quick_tag.dart"
+      },
+      {
+        "name": "Review Bottom Bar",
+        "path": "lib/features/review/view/widgets/review_bottom_bar.dart"
+      },
+      {
+        "name": "Review Filter",
+        "path": "lib/features/review/view/widgets/review_filter.dart"
+      },
+      {
+        "name": "Review Header",
+        "path": "lib/features/review/view/widgets/review_header.dart"
+      },
+      {
+        "name": "Review Item",
+        "path": "lib/features/review/view/widgets/review_item.dart"
+      },
+      {
+        "name": "Review List",
+        "path": "lib/features/review/view/widgets/review_list.dart"
+      },
+      {
+        "name": "Review Section",
+        "path": "lib/features/review/view/widgets/review_section/review_section.dart"
+      },
+      {
+        "name": "Review Quick Tag",
+        "path": "lib/features/review/view/widgets/review_section/widgets/quick_tag.dart"
+      },
+      {
+        "name": "Review Rating Summary",
+        "path": "lib/features/review/view/widgets/review_section/widgets/rating_summary.dart"
+      },
+      {
+        "name": "Review Form",
+        "path": "lib/features/review/view/widgets/review_section/widgets/review_form.dart"
+      },
+      {
+        "name": "Review Header",
+        "path": "lib/features/review/view/widgets/review_section/widgets/review_header.dart"
+      },
+      {
+        "name": "Write Review Button",
+        "path": "lib/features/review/view/widgets/review_section/widgets/write_review_button.dart"
+      },
+      {
+        "name": "Settings Setting Screen",
+        "path": "lib/features/settings/views/setting_screen.dart"
+      },
+      {
+        "name": "Subcategory List Screen",
+        "path": "lib/features/subcategory/views/screens/subcategory_list_screen.dart"
+      },
+      {
+        "name": "Subcategory Products Screen",
+        "path": "lib/features/subcategory/views/screens/subcategory_products_screen.dart"
+      },
+      {
+        "name": "Wishlist Screen",
+        "path": "lib/features/wishlist/views/wishlist_screen.dart"
+      }
+    ],
+    "widgets": [
+      {
+        "name": "Profile Image Widget",
+        "path": "lib/features/profile/views/widgets/profile_edit_widgets/profile_image_widget.dart"
+      },
+      {
+        "name": "Empty Wishlist View",
+        "path": "lib/features/wishlist/views/widget/empty_wishlist_view.dart"
+      },
+      {
+        "name": "Wishlist Header",
+        "path": "lib/features/wishlist/views/widget/wishlist_header.dart"
+      },
+      {
+        "name": "Wishlist Item Tile",
+        "path": "lib/features/wishlist/views/widget/wishlist_item_tile.dart"
+      }
+    ],
+    "project_config": [
+      {
+        "name": "Build.gradle",
+        "path": "android/app/build.gradle.kts"
+      },
+      {
+        "name": " Android Manifest",
+        "path": "android/app/src/main/AndroidManifest.xml"
+      },
+      {
+        "name": " Info",
+        "path": "ios/Runner/Info.plist"
+      },
+      {
+        "name": "Pubspec",
+        "path": "pubspec.yaml"
+      }
+    ],
+    "entry": {
+      "name": "Main",
+      "path": "lib/main.dart"
+    }
+  }
+}

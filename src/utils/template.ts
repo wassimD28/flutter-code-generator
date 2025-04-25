@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import Handlebars from "handlebars";
 
-// Define the ProjectStructure enum that was missing
+// Define the ProjectStructure enum
 export enum ProjectStructure {
   LIB = "lib",
   ROOT = "root",
@@ -10,12 +10,13 @@ export enum ProjectStructure {
   ANDROID = "android",
   IOS = "ios",
 }
+
 export class TemplateUtils {
   private baseTemplatesDir: string;
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;
 
   constructor(baseTemplatesDir?: string) {
-    // FIXED: If a custom templates dir is provided, use it directly
+    // If a custom templates dir is provided, use it directly
     // Otherwise, fall back to the default in src/templates
     this.baseTemplatesDir =
       baseTemplatesDir || path.join(__dirname, "..", "..", "src", "templates");
@@ -33,24 +34,17 @@ export class TemplateUtils {
    * Register all Handlebars helpers
    */
   private registerHelpers(): void {
+    // Your existing helper registrations...
     Handlebars.registerHelper("snakeCase", function (str) {
       if (typeof str !== "string") return "";
-
-      // Convert camelCase boundaries to snake_case
       str = str.replace(/([a-z])([A-Z])/g, "$1_$2");
-
-      // Replace spaces and non-word characters with underscores
       str = str.replace(/[\s\W]+/g, "_");
-
-      // Convert to lowercase
       str = str.toLowerCase();
-
-      // Remove any leading or trailing underscores
       str = str.replace(/^_+|_+$/g, "");
-
       return str;
     });
 
+    // Other helpers...
     Handlebars.registerHelper("pascalCase", (str: string) => {
       return str
         .split(/[-_\s]/)
@@ -67,22 +61,13 @@ export class TemplateUtils {
 
     Handlebars.registerHelper("toLowerCase", (str) => str.toLowerCase());
 
-    // Add a slugify helper to create valid package names
     Handlebars.registerHelper("slugify", (str: string) => {
-      // Convert to lowercase
       let slug = str.toLowerCase();
-
-      // Replace non-alphanumeric characters with underscores
       slug = slug.replace(/[^a-z0-9]/g, "_");
-
-      // Remove consecutive underscores
       slug = slug.replace(/_+/g, "_");
-
-      // Ensure it starts with a letter
       if (/^[^a-z]/.test(slug)) {
         slug = "app_" + slug;
       }
-
       return slug;
     });
   }
@@ -154,100 +139,86 @@ export class TemplateUtils {
 
   /**
    * Resolve the full path to a template file
+   * FIXED: Improved path resolution for different file types
    */
   resolveTemplatePath(
     templateNameOrPath: string,
     projectStructure: ProjectStructure
   ): string {
+    // First, clean up the path by removing any leading template folder name
+    // For example, if path is "fashion/android/app/build.gradle.kts"
+    // Extract just "android/app/build.gradle.kts"
+    let cleanPath = templateNameOrPath;
+
+    // Remove template name prefix if it exists (e.g., "fashion/")
+    if (
+      cleanPath.includes("/") &&
+      !cleanPath.startsWith("lib/") &&
+      !cleanPath.startsWith("android/") &&
+      !cleanPath.startsWith("ios/")
+    ) {
+      cleanPath = cleanPath.substring(cleanPath.indexOf("/") + 1);
+    }
+
     // Special case for pubspec.yaml
-    if (templateNameOrPath === "pubspec.yaml") {
+    if (cleanPath === "pubspec.yaml") {
       return path.join(this.baseTemplatesDir, "pubspec.yaml.hbs");
     }
 
-    // Special case handling for different file types
+    // Handle Gradle files (build.gradle, build.gradle.kts, etc.)
     if (
-      templateNameOrPath === "pubspec.yaml" ||
-      templateNameOrPath.endsWith("pubspec.yaml")
+      cleanPath.includes("build.gradle") ||
+      cleanPath.includes("gradle.properties") ||
+      cleanPath.includes("settings.gradle")
     ) {
-      // Handle the pubspec.yaml file
-      return path.join(this.baseTemplatesDir, "pubspec.yaml.hbs");
-    } else if (templateNameOrPath.includes("AndroidManifest.xml")) {
-      // Handle the AndroidManifest.xml file
-      const relativePath = templateNameOrPath.replace("android/", "");
-      const dirPath = path.dirname(relativePath);
-      return path.join(
-        this.baseTemplatesDir,
-        "android",
-        dirPath,
-        "AndroidManifest.xml.hbs"
-      );
-    } else if (
-      templateNameOrPath.includes("build.gradle") ||
-      templateNameOrPath.includes("gradle.properties") ||
-      templateNameOrPath.includes("settings.gradle")
-    ) {
-      // Handle gradle files
-      const relativePath = templateNameOrPath.replace("android/", "");
-      const dirPath = path.dirname(relativePath);
-      const filename = path.basename(templateNameOrPath);
-      return path.join(
-        this.baseTemplatesDir,
-        "android",
-        dirPath,
-        `${filename}.hbs`
-      );
-    } else if (templateNameOrPath.includes("ios/")) {
-      // Handle iOS files
-      const relativePath = templateNameOrPath.replace("ios/", "");
-      const dirPath = path.dirname(relativePath);
-      const filename = path.basename(templateNameOrPath);
-      return path.join(
-        this.baseTemplatesDir,
-        "ios",
-        dirPath,
-        `${filename}.hbs`
-      );
-    } else if (templateNameOrPath.includes("/")) {
-      // This is a path from config.json like "lib/app/core/config/routes_config.dart"
-      // Extract the filename from the path
-      const filename = path.basename(templateNameOrPath);
+      return path.join(this.baseTemplatesDir, cleanPath + ".hbs");
+    }
 
-      // Create the template filename (add .hbs extension)
-      const templateFilename = `${filename}.hbs`;
+    // Handle AndroidManifest.xml
+    if (cleanPath.includes("AndroidManifest.xml")) {
+      return path.join(this.baseTemplatesDir, cleanPath + ".hbs");
+    }
 
-      // Create the directory structure mirroring the config path
-      // Note: We remove the "lib/" prefix if it exists since it's already in the templates dir structure
-      let relativePath = templateNameOrPath;
-      if (relativePath.startsWith("lib/")) {
-        relativePath = relativePath.substring(4); // Remove "lib/" prefix
-      }
+    // Handle iOS files
+    if (cleanPath.startsWith("ios/")) {
+      return path.join(this.baseTemplatesDir, cleanPath + ".hbs");
+    }
 
-      // Extract the directory part of the path
-      const dirPath = path.dirname(relativePath);
+    // Handle lib files
+    if (cleanPath.startsWith("lib/")) {
+      // Remove "lib/" prefix as it's already part of the template directory structure
+      const libPath = cleanPath.substring(4);
+      return path.join(this.baseTemplatesDir, "lib", libPath + ".hbs");
+    }
 
-      // Construct the full template path based on projectStructure
+    // For paths with directories
+    if (cleanPath.includes("/")) {
+      const filename = path.basename(cleanPath);
+      const dirPath = path.dirname(cleanPath);
+
+      // Determine the correct base directory based on projectStructure
       if (projectStructure === ProjectStructure.LIB) {
         return path.join(
           this.baseTemplatesDir,
           "lib",
           dirPath,
-          templateFilename
+          filename + ".hbs"
         );
       } else {
         return path.join(
           this.baseTemplatesDir,
           projectStructure.toString(),
           dirPath,
-          templateFilename
+          filename + ".hbs"
         );
       }
-    } else {
-      // This is just a template name like "main.dart.hbs"
-      return path.join(
-        this.baseTemplatesDir,
-        projectStructure.toString(),
-        templateNameOrPath
-      );
     }
+
+    // For simple template names
+    return path.join(
+      this.baseTemplatesDir,
+      projectStructure.toString(),
+      templateNameOrPath
+    );
   }
 }

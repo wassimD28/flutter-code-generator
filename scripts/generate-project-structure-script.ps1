@@ -5,7 +5,8 @@
 param (
     [string]$configPath = "C:\Users\wassi\OneDrive\Documents\Projects\flutter-generator\config.json",
     [string]$templateFolderPath = "C:\Users\wassi\OneDrive\Documents\Projects\flutter-generator\src\templates",
-    [switch]$Debug = $false  # Debug switch
+    [switch]$Debug = $false,  # Debug switch
+    [switch]$VerboseLog = $false  # More detailed logging
 )
 
 # Function to log debug information
@@ -16,7 +17,14 @@ function Write-DebugLog {
     }
 }
 
-# Fixed function to convert file names to proper Title Case
+# Function for more verbose logging (showing all files being processed)
+function Write-VerboseLog {
+    param([string]$message)
+    if ($VerboseLog) {
+        Write-Host "VERBOSE: $message" -ForegroundColor Gray
+    }
+}
+
 # Improved function to convert file names to proper Title Case
 function Get-PrettyName {
     param (
@@ -42,6 +50,12 @@ function Get-PrettyName {
         "ssl" = "SSL"
         "tls" = "TLS"
         "db" = "Database"
+        "app_notification_type" = "App Notification Type"
+        "app_config" = "App Configuration"
+        "app_typography" = "App Typography"
+        "main_routes" = "Main Routes"
+        "custom_app_bar" = "Custom App Bar"
+        "alert_exit_app" = "Alert Exit"
     }
     
     # First check if the entire name is a special case
@@ -82,6 +96,7 @@ function Get-PrettyName {
     
     return ($result -join " ")
 }
+
 # Extract the meaningful component from the path for better naming
 function Get-ComponentNameFromPath {
     param (
@@ -141,7 +156,7 @@ function Get-SafeFileName {
     }
 }
 
-# Function to categorize a file based on its name and path
+# Enhanced function to categorize a file based on its name and path
 function Get-FileCategory {
     param (
         [string]$fileName,
@@ -151,15 +166,35 @@ function Get-FileCategory {
     $lowerFileName = $fileName.ToLower()
     $lowerPath = $filePath.ToLower()
     
-    # Specifically check for main.dart to categorize as entry
-    # All other files should be categorized differently
+    # Check for specific files you mentioned as missing
+    $specificFiles = @{
+        "app_notification_type" = "core"
+        "app_config" = "core"
+        "app_typography" = "theme"
+        "custom_app_bar" = "widgets"
+        "main_routes" = "core"
+    }
+    
+    # First check for exact matches of specific files
+    foreach ($key in $specificFiles.Keys) {
+        if ($lowerFileName -eq $key) {
+            return $specificFiles[$key]
+        }
+    }
+    
+    # Check for config files first - they should be categorized as core
+    if ($lowerPath -match '/config/' -or $lowerFileName -match 'config') {
+        return "core"
+    }
+    
+    # Then check for specific patterns in the file name
     if (($lowerFileName -eq "main") -and ($lowerPath -match "^lib/main\.dart$")) {
         return "entry"  # Only exact match for lib/main.dart should be entry
     }
     elseif ($lowerFileName -match 'screen' -or $lowerFileName -match 'page' -or $lowerFileName -match 'view') {
         return "screens"
     }
-    elseif ($lowerFileName -match 'widget' -or $lowerFileName -match 'component') {
+    elseif ($lowerFileName -match 'widget' -or $lowerFileName -match 'component' -or $lowerFileName -match 'app_bar') {
         # Decide between shared_widgets and widgets
         if ($lowerPath -match '/shared/' -or $lowerPath -match '/common/') {
             return "shared_widgets"
@@ -188,7 +223,7 @@ function Get-FileCategory {
     elseif ($lowerFileName -match 'binding' -or $lowerFileName -match 'binder') {
         return "bindings"
     }
-    elseif ($lowerFileName -match 'theme' -or $lowerFileName -match 'style' -or $lowerFileName -match 'color') {
+    elseif ($lowerFileName -match 'theme' -or $lowerFileName -match 'style' -or $lowerFileName -match 'color' -or $lowerFileName -match 'typography') {
         return "theme"
     }
     elseif ($lowerFileName -match 'util' -or $lowerFileName -match 'helper' -or $lowerFileName -match 'formatter' -or $lowerFileName -match 'extension') {
@@ -262,6 +297,53 @@ function Get-NormalizedPath {
     return $path -replace '\\', '/'
 }
 
+# Function to check for specific missing files
+function Test-SpecificFiles {
+    param (
+        [string]$templatePath,
+        [array]$filesList
+    )
+    
+    # Files to specifically check for
+    $filesToCheck = @(
+        "lib/app/core/config/app_notification_type.dart.hbs",
+        "lib/app/core/config/app_config.dart.hbs",
+        "lib/app/core/theme/app_typography.dart.hbs",
+        "lib/features/home/views/widgets/custom_app_bar.dart.hbs",
+        "lib/app/core/config/main_routes.dart.hbs"
+        "lib/app/core/utils/alert_exit_app.dart"
+    )
+    
+    Write-Host "Checking for specific files:" -ForegroundColor Yellow
+    
+    foreach ($fileToCheck in $filesToCheck) {
+        $fullPath = Join-Path -Path $templatePath -ChildPath $fileToCheck
+        
+        if (Test-Path $fullPath) {
+            Write-Host "  - File exists: $fileToCheck" -ForegroundColor Green
+            
+            # Check if it's in the processed list
+            $found = $false
+            foreach ($file in $filesList) {
+                $relativePath = $file.FullName.Substring($templatePath.Length + 1)
+                $normalizedPath = Get-NormalizedPath -path $relativePath
+                
+                if ($normalizedPath -eq $fileToCheck) {
+                    $found = $true
+                    Write-Host "    - File is in processing list" -ForegroundColor Green
+                    break
+                }
+            }
+            
+            if (-not $found) {
+                Write-Host "    - WARNING: File exists but is NOT in processing list!" -ForegroundColor Red
+            }
+        } else {
+            Write-Host "  - File NOT found: $fileToCheck" -ForegroundColor Red
+        }
+    }
+}
+
 # Function to scan template files
 function Get-TemplateFiles {
     param (
@@ -278,6 +360,9 @@ function Get-TemplateFiles {
 
     # Get all files recursively
     $files = Get-ChildItem -Path $templateFolderPath -File -Recurse
+    
+    # Check for specific files we want to ensure are processed
+    Test-SpecificFiles -templatePath $templateFolderPath -filesList $files
 
     # Create structure exactly as specified
     $projectStructure = @{
@@ -304,8 +389,25 @@ function Get-TemplateFiles {
     
     $totalFiles = $files.Count
     $processedCount = 0
+    $missingFiles = @(
+        "lib/app/core/config/app_notification_type.dart",
+        "lib/app/core/config/app_config.dart",
+        "lib/app/core/theme/app_typography.dart",
+        "lib/features/home/views/widgets/custom_app_bar.dart",
+        "lib/app/core/config/main_routes.dart"
+        "lib/app/core/utils/alert_exit_app.dart"
+    )
+    
+    # Track found files from the missing list
+    $foundMissingFiles = @{}
+    foreach ($file in $missingFiles) {
+        $foundMissingFiles[$file] = $false
+    }
     
     Write-Host "Found $totalFiles files to process"
+    
+    # Track processed paths to verify everything is included
+    $processedPaths = @{}
     
     foreach ($file in $files) {
         $processedCount++
@@ -321,6 +423,18 @@ function Get-TemplateFiles {
         # Normalize path separators for consistency
         $normalizedPath = Get-NormalizedPath -path $relativePath
         
+        # Check if this is one of our missing files
+        $pathWithoutHbs = $normalizedPath -replace '\.hbs$', ''
+        foreach ($missingFile in $missingFiles) {
+            if ($pathWithoutHbs -eq $missingFile) {
+                Write-Host "Found missing file: $missingFile" -ForegroundColor Green
+                $foundMissingFiles[$missingFile] = $true
+            }
+        }
+        
+        # Track processed paths
+        $processedPaths[$normalizedPath] = $true
+        
         # Remove .hbs extension if present
         $normalizedPath = $normalizedPath -replace '\.hbs$', ''
         
@@ -333,7 +447,7 @@ function Get-TemplateFiles {
             path = $normalizedPath
         }
         
-        Write-DebugLog "Processing file: $($file.Name) -> $($item.name) at $normalizedPath"
+        Write-VerboseLog "Processing file: $($file.Name) -> $($item.name) at $normalizedPath"
         
         # Get file name without extension for categorization
         $fileName = Get-SafeFileName $file.Name
@@ -342,14 +456,35 @@ function Get-TemplateFiles {
         $category = Get-FileCategory -fileName $fileName -filePath $normalizedPath
         
         # Add to appropriate category BUT protect entry from being overwritten
-        if ($category -eq "entry") {
-            # Option 1: Skip adding other files as entry
-            Write-DebugLog "Found a main entry file but using default entry configuration"
-            # Do not modify the entry property
-        } else {
+        if ($category -eq "entry" -and $normalizedPath -eq "lib/main.dart") {
+            # Set the entry explicitly
+            $projectStructure.entry = @{
+                name = "Main"
+                path = "lib/main.dart"
+            }
+            Write-DebugLog "Set main entry file: $($item.path)"
+        } 
+        elseif ($category -eq "entry") {
+            # Skip other "entry" categorized files
+            Write-DebugLog "Found another entry-like file but using default entry configuration: $($item.path)"
+        }
+        else {
             $projectStructure[$category] += $item
             Write-DebugLog "Added to $category : $($item.path)"
         }
+    }
+    
+    # Check and report any missing files that were not found
+    $stillMissing = $false
+    foreach ($key in $foundMissingFiles.Keys) {
+        if (-not $foundMissingFiles[$key]) {
+            Write-Host "WARNING: Still missing file: $key" -ForegroundColor Red
+            $stillMissing = $true
+        }
+    }
+    
+    if (-not $stillMissing) {
+        Write-Host "All previously missing files were found and processed!" -ForegroundColor Green
     }
     
     # Print category summary
@@ -359,6 +494,73 @@ function Get-TemplateFiles {
             Write-Host "- Entry: $(if ($projectStructure.entry) { '1' } else { '0' }) file"
         } else {
             Write-Host "- $((Get-Culture).TextInfo.ToTitleCase($category.Replace('_', ' '))): $($projectStructure[$category].Count) files"
+        }
+    }
+    
+    # Verify all specific files are categorized
+    Write-Host "Verifying specific files categorization:" -ForegroundColor Yellow
+    $specificPaths = @(
+        @{ Path = "lib/app/core/config/app_notification_type.dart"; ExpectedCategory = "core" },
+        @{ Path = "lib/app/core/config/app_config.dart"; ExpectedCategory = "core" },
+        @{ Path = "lib/app/core/theme/app_typography.dart"; ExpectedCategory = "theme" },
+        @{ Path = "lib/features/home/views/widgets/custom_app_bar.dart"; ExpectedCategory = "widgets" },
+        @{ Path = "lib/app/core/config/main_routes.dart"; ExpectedCategory = "core" }
+        @{ Path = "lib//app/core/utils/alert_exit_app.dart"; ExpectedCategory = "widgets" }
+    )
+    
+    foreach ($specificPath in $specificPaths) {
+        $path = $specificPath.Path
+        $expectedCategory = $specificPath.ExpectedCategory
+        $found = $false
+        
+        foreach ($item in $projectStructure[$expectedCategory]) {
+            if ($item.path -eq $path) {
+                Write-Host "  - Found correctly categorized: $path in $expectedCategory" -ForegroundColor Green
+                $found = $true
+                break
+            }
+        }
+        
+        if (-not $found) {
+            Write-Host "  - NOT found in expected category: $path in $expectedCategory" -ForegroundColor Red
+            
+            # Search other categories
+            foreach ($category in $projectStructure.Keys) {
+                if ($category -eq "entry") { continue }
+                
+                foreach ($item in $projectStructure[$category]) {
+                    if ($item.path -eq $path) {
+                        Write-Host "    - Found instead in: $category" -ForegroundColor Yellow
+                    }
+                }
+            }
+        }
+    }
+    
+    # Add missing specific files if needed
+    foreach ($specificPath in $specificPaths) {
+        $path = $specificPath.Path
+        $expectedCategory = $specificPath.ExpectedCategory
+        $found = $false
+        
+        foreach ($item in $projectStructure[$expectedCategory]) {
+            if ($item.path -eq $path) {
+                $found = $true
+                break
+            }
+        }
+        
+        if (-not $found) {
+            Write-Host "Adding missing specific file: $path to $expectedCategory" -ForegroundColor Yellow
+            $fileName = [System.IO.Path]::GetFileNameWithoutExtension($path)
+            $prettyName = Get-PrettyName -name $fileName
+            
+            $newItem = @{
+                name = $prettyName
+                path = $path
+            }
+            
+            $projectStructure[$expectedCategory] += $newItem
         }
     }
     

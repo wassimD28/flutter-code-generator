@@ -145,16 +145,12 @@ export class FlutterAppGenerator {
     if (!items) return;
 
     for (const item of items) {
-      // Create a template name based on the item's path
-      const filename = path.basename(item.path);
-      const templateName = `${filename}.hbs`;
-
       // Log which file we're generating
       this.logger.info(`Generating ${item.name}`);
 
-      // Compile the template - if the template doesn't exist, this will throw an error
+      // Compile the template using the full path from config
       const content = await this.templateUtils.compileTemplate(
-        templateName,
+        item.path,
         config
       );
 
@@ -245,16 +241,17 @@ export class FlutterAppGenerator {
       if (!items) return;
 
       for (const item of items) {
-        const filename = path.basename(item.path);
-        const templateName = `${filename}.hbs`;
-
         try {
+          // Pass the full path from config directly to loadTemplate
           await this.templateUtils.loadTemplate(
-            templateName,
+            item.path,
             ProjectStructure.LIB
           );
         } catch (error) {
           // Add to the appropriate category
+          const filename = path.basename(item.path);
+          const templateName = `${filename}.hbs`;
+
           if (missingTemplates[category]) {
             missingTemplates[category].push(templateName);
           } else {

@@ -83,20 +83,50 @@ export class TemplateUtils {
    * Load a template from file
    */
   async loadTemplate(
-    templateName: string,
+    templateNameOrPath: string,
     projectStructure: ProjectStructure
   ): Promise<string> {
     let templatePath: string;
 
-    // Special case for pubspec.yaml
-    if (templateName === "pubspec.yaml.hbs") {
-      templatePath = path.join(this.baseTemplatesDir, templateName);
-    } else {
+    // Check if this is a full path (from config.json) or just a template name
+    if (templateNameOrPath.includes("/")) {
+      // This is a path from config.json like "lib/app/core/config/routes_config.dart"
+      // Convert it to a template path
+
+      // Extract the filename from the path
+      const filename = path.basename(templateNameOrPath);
+
+      // Create the template filename (add .hbs extension)
+      const templateFilename = `${filename}.hbs`;
+
+      // Create the directory structure mirroring the config path
+      // Note: We remove the "lib/" prefix if it exists since it's already in the templates dir structure
+      let relativePath = templateNameOrPath;
+      if (relativePath.startsWith("lib/")) {
+        relativePath = relativePath.substring(4); // Remove "lib/" prefix
+      }
+
+      // Extract the directory part of the path
+      const dirPath = path.dirname(relativePath);
+
+      // Construct the full template path
       templatePath = path.join(
         this.baseTemplatesDir,
         projectStructure,
-        templateName
+        dirPath,
+        templateFilename
       );
+    } else {
+      // This is just a template name like "pubspec.yaml.hbs"
+      if (templateNameOrPath === "pubspec.yaml.hbs") {
+        templatePath = path.join(this.baseTemplatesDir, templateNameOrPath);
+      } else {
+        templatePath = path.join(
+          this.baseTemplatesDir,
+          projectStructure,
+          templateNameOrPath
+        );
+      }
     }
 
     try {
@@ -106,26 +136,25 @@ export class TemplateUtils {
       return templateContent;
     } catch (error) {
       throw new Error(
-        `Template not found: ${templateName} at path: ${templatePath}. Please ensure the template exists before running the generator.`
+        `Template not found: ${templateNameOrPath} at path: ${templatePath}. Please ensure the template exists before running the generator.`
       );
     }
   }
-
   /**
    * Compile a template with provided context
    */
   async compileTemplate<T>(
-    templateName: string,
+    templateNameOrPath: string,
     context: T,
     projectStructure: ProjectStructure = ProjectStructure.LIB
   ): Promise<string> {
     // Generate a cache key that includes both template name and structure
-    const cacheKey = `${projectStructure}:${templateName}`;
+    const cacheKey = `${projectStructure}:${templateNameOrPath}`;
 
     // Check cache first
     if (!this.templatesCache.has(cacheKey)) {
       const templateSource = await this.loadTemplate(
-        templateName,
+        templateNameOrPath,
         projectStructure
       );
       this.templatesCache.set(cacheKey, Handlebars.compile(templateSource));
@@ -133,10 +162,9 @@ export class TemplateUtils {
 
     const template = this.templatesCache.get(cacheKey);
     if (!template) {
-      throw new Error(`Template not found: ${templateName}`);
+      throw new Error(`Template not found: ${templateNameOrPath}`);
     }
 
     return template(context);
   }
-  
 }

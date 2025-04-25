@@ -4,7 +4,7 @@ import { FileUtils } from "../utils/file";
 import { ProjectStructure, TemplateUtils } from "../utils/template";
 import { ImageUtils } from "../utils/image";
 import { Logger } from "../cli/logger";
-import fs from "fs/promises";
+
 export class FlutterAppGenerator {
   private fileUtils: FileUtils;
   private templateUtils: TemplateUtils;
@@ -43,12 +43,14 @@ export class FlutterAppGenerator {
     // Process config
     const config = this.processConfig(rawConfig);
     this.logger.info(`Generating app for: ${config.metadata.storeName}`);
+
     // Validate templates before starting generation
     this.logger.info("Validating templates...");
     const templatesValid = await this.validateTemplates(config);
     if (!templatesValid) {
       throw new Error("Generation failed due to missing template files");
     }
+
     // Create directory structure based on projectStructure
     await this.fileUtils.createDirectoryStructure(outputDir);
 
@@ -65,7 +67,7 @@ export class FlutterAppGenerator {
     return outputDir;
   }
 
-  // New method to download all assets
+  // Download all assets
   private async downloadAssets(
     config: ProcessedConfig,
     outputDir: string
@@ -79,7 +81,7 @@ export class FlutterAppGenerator {
     }
   }
 
-  // New method to generate the full project structure
+  // Generate the full project structure
   private async generateProjectStructure(
     config: ProcessedConfig,
     outputDir: string
@@ -134,13 +136,22 @@ export class FlutterAppGenerator {
     await this.generateStructureSection(structure.bindings, config, outputDir);
     await this.generateStructureSection(structure.screens, config, outputDir);
     await this.generateStructureSection(structure.widgets, config, outputDir);
-    await this.generateAndroidFiles(config, outputDir);
+
+    // Generate project configuration files (pubspec.yaml, AndroidManifest.xml, build.gradle.kts)
+    await this.generateStructureSection(
+      structure.project_config,
+      config,
+      outputDir,
+      this.determineProjectStructureType
+    );
   }
+
   // Helper method to generate files for a section of the project structure
   private async generateStructureSection(
     items: Array<{ name: string; path: string }> | undefined,
     config: ProcessedConfig,
-    outputDir: string
+    outputDir: string,
+    structureTypeCallback?: (path: string) => ProjectStructure
   ): Promise<void> {
     if (!items) return;
 
@@ -148,10 +159,16 @@ export class FlutterAppGenerator {
       // Log which file we're generating
       this.logger.info(`Generating ${item.name}`);
 
+      // Determine the appropriate ProjectStructure type
+      const structureType = structureTypeCallback
+        ? structureTypeCallback(item.path)
+        : ProjectStructure.LIB;
+
       // Compile the template using the full path from config
       const content = await this.templateUtils.compileTemplate(
         item.path,
-        config
+        config,
+        structureType
       );
 
       // Write the file
@@ -159,6 +176,20 @@ export class FlutterAppGenerator {
       await this.fileUtils.writeFile(filePath, content);
     }
   }
+
+  // Helper method to determine the ProjectStructure type based on file path
+  private determineProjectStructureType(filePath: string): ProjectStructure {
+    if (filePath.startsWith("android/")) {
+      return ProjectStructure.ANDROID;
+    } else if (filePath === "pubspec.yaml") {
+      return ProjectStructure.ROOT;
+    } else if (filePath.startsWith("assets/")) {
+      return ProjectStructure.ASSETS;
+    } else {
+      return ProjectStructure.LIB;
+    }
+  }
+
   /**
    * Create a manifest file containing generation details
    */
@@ -181,42 +212,8 @@ export class FlutterAppGenerator {
       JSON.stringify(manifest, null, 2)
     );
   }
-  private async generateAndroidFiles(
-    config: ProcessedConfig,
-    outputDir: string
-  ): Promise<void> {
-    // Generate build.gradle.kts
-    const buildGradlePath = path.join(
-      outputDir,
-      "android",
-      "app",
-      "build.gradle.kts"
-    );
-    const buildGradleContent = await this.templateUtils.compileTemplate(
-      "build.gradle.kts.hbs",
-      config,
-      ProjectStructure.ANDROID
-    );
-    await this.fileUtils.writeFile(buildGradlePath, buildGradleContent);
 
-    // Generate AndroidManifest.xml
-    const manifestPath = path.join(
-      outputDir,
-      "android",
-      "app",
-      "src",
-      "main",
-      "AndroidManifest.xml"
-    );
-    const manifestContent = await this.templateUtils.compileTemplate(
-      "AndroidManifest.xml.hbs",
-      config,
-      ProjectStructure.ANDROID
-    );
-    await this.fileUtils.writeFile(manifestPath, manifestContent);
-  }
-
-  // template validation method that organizes errors by category
+  // Template validation method that organizes errors by category
   private async validateTemplates(config: ProcessedConfig): Promise<boolean> {
     // Create a structured object to group missing templates by category
     const missingTemplates: Record<string, string[]> = {
@@ -230,6 +227,7 @@ export class FlutterAppGenerator {
       bindings: [],
       screens: [],
       widgets: [],
+      project_config: [], // Add this for the new category
       other: [],
     };
 
@@ -242,11 +240,11 @@ export class FlutterAppGenerator {
 
       for (const item of items) {
         try {
+          // Determine the appropriate ProjectStructure type
+          const structureType = this.determineProjectStructureType(item.path);
+
           // Pass the full path from config directly to loadTemplate
-          await this.templateUtils.loadTemplate(
-            item.path,
-            ProjectStructure.LIB
-          );
+          await this.templateUtils.loadTemplate(item.path, structureType);
         } catch (error) {
           // Add to the appropriate category
           const filename = path.basename(item.path);
@@ -310,6 +308,10 @@ export class FlutterAppGenerator {
     );
     await checkTemplatesForSection(config.projectStructure.screens, "screens");
     await checkTemplatesForSection(config.projectStructure.widgets, "widgets");
+    await checkTemplatesForSection(
+      config.projectStructure.project_config,
+      "project_config"
+    );
 
     // Check if we have any missing templates
     const hasMissingTemplates = Object.values(missingTemplates).some(

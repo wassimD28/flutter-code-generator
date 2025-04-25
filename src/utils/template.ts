@@ -8,6 +8,7 @@ export enum ProjectStructure {
   ROOT = "root",
   ASSETS = "assets",
   ANDROID = "android",
+  IOS = "ios",
 }
 export class TemplateUtils {
   private baseTemplatesDir: string;
@@ -80,24 +81,75 @@ export class TemplateUtils {
   }
 
   /**
-   * Load a template from file
+   * Load a template from file with improved path handling
    */
   async loadTemplate(
     templateNameOrPath: string,
     projectStructure: ProjectStructure
   ): Promise<string> {
-    let templatePath: string;
+    let templatePath = "unknown";
 
-    // Check if this is a full path (from config.json) or just a template name
-    if (templateNameOrPath.includes("/")) {
+    // Determine the correct template directory based on the file path and structure
+    let templateDir = "";
+    let templateFilename = "";
+
+    // Special case handling for different file types
+    if (
+      templateNameOrPath === "pubspec.yaml" ||
+      templateNameOrPath.endsWith("pubspec.yaml")
+    ) {
+      // Handle the pubspec.yaml file
+      templateDir = "root";
+      templateFilename = "pubspec.yaml.hbs";
+    } else if (templateNameOrPath.includes("AndroidManifest.xml")) {
+      // Handle the AndroidManifest.xml file
+      templateDir = "android";
+      const relativePath = templateNameOrPath.replace("android/", "");
+      const dirPath = path.dirname(relativePath);
+      templatePath = path.join(
+        this.baseTemplatesDir,
+        "android",
+        dirPath,
+        "AndroidManifest.xml.hbs"
+      );
+      return await this.readTemplateFile(templatePath);
+    } else if (
+      templateNameOrPath.includes("build.gradle") ||
+      templateNameOrPath.includes("gradle.properties") ||
+      templateNameOrPath.includes("settings.gradle")
+    ) {
+      // Handle gradle files
+      templateDir = "android";
+      const relativePath = templateNameOrPath.replace("android/", "");
+      const dirPath = path.dirname(relativePath);
+      const filename = path.basename(templateNameOrPath);
+      templatePath = path.join(
+        this.baseTemplatesDir,
+        "android",
+        dirPath,
+        `${filename}.hbs`
+      );
+      return await this.readTemplateFile(templatePath);
+    } else if (templateNameOrPath.includes("ios/")) {
+      // Handle iOS files
+      templateDir = "ios";
+      const relativePath = templateNameOrPath.replace("ios/", "");
+      const dirPath = path.dirname(relativePath);
+      const filename = path.basename(templateNameOrPath);
+      templatePath = path.join(
+        this.baseTemplatesDir,
+        "ios",
+        dirPath,
+        `${filename}.hbs`
+      );
+      return await this.readTemplateFile(templatePath);
+    } else if (templateNameOrPath.includes("/")) {
       // This is a path from config.json like "lib/app/core/config/routes_config.dart"
-      // Convert it to a template path
-
       // Extract the filename from the path
       const filename = path.basename(templateNameOrPath);
 
       // Create the template filename (add .hbs extension)
-      const templateFilename = `${filename}.hbs`;
+      templateFilename = `${filename}.hbs`;
 
       // Create the directory structure mirroring the config path
       // Note: We remove the "lib/" prefix if it exists since it's already in the templates dir structure
@@ -112,23 +164,25 @@ export class TemplateUtils {
       // Construct the full template path
       templatePath = path.join(
         this.baseTemplatesDir,
-        projectStructure,
+        projectStructure.toString(),
         dirPath,
         templateFilename
       );
     } else {
-      // This is just a template name like "pubspec.yaml.hbs"
-      if (templateNameOrPath === "pubspec.yaml.hbs") {
-        templatePath = path.join(this.baseTemplatesDir, templateNameOrPath);
-      } else {
-        templatePath = path.join(
-          this.baseTemplatesDir,
-          projectStructure,
-          templateNameOrPath
-        );
-      }
+      // This is just a template name like "main.dart.hbs"
+      templatePath = path.join(
+        this.baseTemplatesDir,
+        projectStructure.toString(),
+        templateNameOrPath
+      );
     }
+    return await this.readTemplateFile(templatePath);
+  }
 
+  /**
+   * Helper method to read template file
+   */
+  private async readTemplateFile(templatePath: string): Promise<string> {
     try {
       // Check if the file exists before reading
       await fs.access(templatePath);
@@ -136,10 +190,11 @@ export class TemplateUtils {
       return templateContent;
     } catch (error) {
       throw new Error(
-        `Template not found: ${templateNameOrPath} at path: ${templatePath}. Please ensure the template exists before running the generator.`
+        `Template not found at path: ${templatePath}. Please ensure the template exists before running the generator.`
       );
     }
   }
+
   /**
    * Compile a template with provided context
    */

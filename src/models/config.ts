@@ -43,6 +43,7 @@ export interface StoreConfig {
     bindings: Array<{ name: string; path: string }>;
     screens: Array<{ name: string; path: string }>;
     widgets: Array<{ name: string; path: string }>;
+    project_config: Array<{ name: string; path: string }>;
     entry: {
       name: string;
       path: string;

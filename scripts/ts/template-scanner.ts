@@ -241,7 +241,10 @@ function getTemplateFiles(templateFolderPath: string): ProjectStructure {
       .replace(/\\/g, "/");
 
     // Remove .hbs extension if present
-    const cleanPath = relativePath.replace(/\.hbs$/, "");
+    // Remove any leading directory before "lib/"
+    const cleanPath = relativePath
+      .replace(/\.hbs$/, "")
+      .replace(/^.*?(lib\/)/, "$1");
 
     // Generate better name
     const prettyName = getComponentNameFromPath(cleanPath);

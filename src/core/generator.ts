@@ -265,7 +265,7 @@ export class FlutterAppGenerator {
     // Check main entry template
     try {
       await this.templateUtils.loadTemplate(
-        "main.dart.hbs",
+        config.projectStructure.entry.path,
         ProjectStructure.LIB
       );
     } catch (error) {

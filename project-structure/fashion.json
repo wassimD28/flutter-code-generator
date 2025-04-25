@@ -1006,19 +1006,19 @@
     "project_config": [
       {
         "name": "Build.gradle",
-        "path": "android/app/build.gradle.kts"
-      },
-      {
-        "name": " Android Manifest",
-        "path": "android/app/src/main/AndroidManifest.xml"
+        "path": "fashion/android/app/build.gradle.kts"
       },
       {
         "name": " Info",
-        "path": "ios/Runner/Info.plist"
+        "path": "fashion/ios/Runner/Info.plist"
       },
       {
         "name": "Pubspec",
-        "path": "pubspec.yaml"
+        "path": "fashion/pubspec.yaml"
+      },
+      {
+        "name": " Android Manifest",
+        "path": "fashion/src/main/AndroidManifest.xml"
       }
     ],
     "entry": {

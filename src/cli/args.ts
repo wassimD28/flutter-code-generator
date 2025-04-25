@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { StoreConfig } from "../models/config";
 
+
 export function parseArgs(): {
   config: StoreConfig;
   outputDir: string;
@@ -81,11 +82,31 @@ export function parseArgs(): {
       const structureContent = fs.readFileSync(structurePath, "utf-8");
       const projectStructure = JSON.parse(structureContent);
 
+      // Log the project structure to debug
+      console.log(
+        "[DEBUG] Project structure loaded:",
+        JSON.stringify({
+          hasEntry: !!projectStructure.entry,
+          entryPath: projectStructure.entry?.path,
+          sections: Object.keys(projectStructure),
+        })
+      );
+
       // Merge the project structure into the config
       config = {
         ...config,
         projectStructure,
       };
+
+      // Verify the merged config has the expected structure
+      console.log(
+        "[DEBUG] Merged config structure:",
+        JSON.stringify({
+          hasProjectStructure: !!config.projectStructure,
+          hasEntryInStructure: !!config.projectStructure?.entry,
+          entryPath: config.projectStructure?.entry?.path,
+        })
+      );
     }
 
     return {

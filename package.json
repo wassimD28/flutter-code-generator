@@ -13,7 +13,8 @@
     "generate:fashion": "ts-node src/index.ts --config config.json --structure project-structure/fashion.json --output generated-app --template templates/fashion",
     "generate:custom": "ts-node src/index.ts",
     "scan:help": "ts-node scripts/ts/template-scanner.ts --help",
-    "scan:fashion": "ts-node scripts/ts/template-scanner.ts --input src/templates --output project-structure/fashion.json"
+    "scan:fashion": "ts-node scripts/ts/template-scanner.ts --input src/templates --output project-structure/fashion.json",
+    "check:struct": "ts-node scripts/ts/structure-checker.ts"
   },
   "keywords": [
     "flutter",

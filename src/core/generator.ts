@@ -234,6 +234,41 @@ export class FlutterAppGenerator {
       other: [],
     };
 
+    // Check if the project structure is defined
+    if (!config.projectStructure) {
+      this.logger.error(
+        "Project structure is not defined in the configuration"
+      );
+      return false;
+    }
+
+    // Check main entry template
+    try {
+      // First, check if entry exists
+      if (!config.projectStructure.entry) {
+        this.logger.error(
+          "Entry point is not defined in the project structure"
+        );
+        missingTemplates.core.push("entry point (main.dart.hbs)");
+      } else {
+        const entryTemplateType = this.determineProjectStructureType(
+          config.projectStructure.entry.path
+        );
+        const entryTemplatePath = this.templateUtils.resolveTemplatePath(
+          config.projectStructure.entry.path,
+          entryTemplateType
+        );
+        await this.fileUtils.fileExists(entryTemplatePath);
+      }
+    } catch (error) {
+      missingTemplates.core.push("main.dart.hbs");
+      this.logger.debug(
+        `Failed to find entry template: ${
+          config.projectStructure.entry?.path || "undefined"
+        }`
+      );
+    }
+
     // Helper function to check templates for a structure section
     const checkTemplatesForSection = async (
       items: Array<{ name: string; path: string }> | undefined,
@@ -270,23 +305,6 @@ export class FlutterAppGenerator {
         }
       }
     };
-
-    // Check main entry template
-    try {
-      const entryTemplateType = this.determineProjectStructureType(
-        config.projectStructure.entry.path
-      );
-      const entryTemplatePath = this.templateUtils.resolveTemplatePath(
-        config.projectStructure.entry.path,
-        entryTemplateType
-      );
-      await this.fileUtils.fileExists(entryTemplatePath);
-    } catch (error) {
-      missingTemplates.core.push("main.dart.hbs");
-      this.logger.debug(
-        `Failed to find entry template: ${config.projectStructure.entry.path}`
-      );
-    }
 
     // Check templates for each section, mapping to the appropriate category
     await checkTemplatesForSection(config.projectStructure.core, "core");

@@ -173,6 +173,7 @@ function Get-FileCategory {
         "app_typography" = "theme"
         "custom_app_bar" = "widgets"
         "main_routes" = "core"
+        "alert_exit_app" = "utils"
     }
     
     # First check for exact matches of specific files
@@ -504,8 +505,8 @@ function Get-TemplateFiles {
         @{ Path = "lib/app/core/config/app_config.dart"; ExpectedCategory = "core" },
         @{ Path = "lib/app/core/theme/app_typography.dart"; ExpectedCategory = "theme" },
         @{ Path = "lib/features/home/views/widgets/custom_app_bar.dart"; ExpectedCategory = "widgets" },
-        @{ Path = "lib/app/core/config/main_routes.dart"; ExpectedCategory = "core" }
-        @{ Path = "lib//app/core/utils/alert_exit_app.dart"; ExpectedCategory = "widgets" }
+        @{ Path = "lib/app/core/config/main_routes.dart"; ExpectedCategory = "core" },
+        @{ Path = "lib/app/core/utils/alert_exit_app.dart"; ExpectedCategory = "utils" }
     )
     
     foreach ($specificPath in $specificPaths) {

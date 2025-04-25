@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
-import 'package:store_go/app/core/services/enhanced_image_cache.dart';
-import 'package:store_go/app/core/services/pusher_service.dart';
-import 'package:store_go/app/shared/controllers/navigation_controller.dart';
-import 'package:store_go/features/auth/services/token_manager.dart';
-import 'package:store_go/app/shared/controllers/theme_controller.dart';
-import 'package:store_go/app/core/services/image_preloader_manager.dart';
-import 'package:store_go/app/core/services/api_client.dart';
-import 'package:store_go/features/profile/services/user_api_service.dart';
-import 'package:store_go/features/auth/services/auth_service.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/enhanced_image_cache.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/pusher_service.dart';
+import 'package:{{ snakeCase appName }}/app/shared/controllers/navigation_controller.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/token_manager.dart';
+import 'package:{{ snakeCase appName }}/app/shared/controllers/theme_controller.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/image_preloader_manager.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/api_client.dart';
+import 'package:{{ snakeCase appName }}/features/profile/services/user_api_service.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/auth_service.dart';
 
 class ServiceLocator {
   static Future<void> registerDependencies() async {
@@ -33,3 +33,4 @@ class ServiceLocator {
     await Get.putAsync(() => ImagePreloaderManager().init(), permanent: true);
   }
 }
+

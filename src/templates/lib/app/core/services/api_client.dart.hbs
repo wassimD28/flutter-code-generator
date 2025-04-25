@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:store_go/app/core/config/app_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/app_config.dart';
 import 'package:get/get.dart';
-import 'package:store_go/app/core/config/routes_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/routes_config.dart';
 import 'package:logger/logger.dart';
-import 'package:store_go/app/core/services/pusher_service.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/pusher_service.dart';
 import 'package:synchronized/synchronized.dart';
 
 class ApiClient {
@@ -257,3 +257,4 @@ class ApiClient {
     });
   }
 }
+

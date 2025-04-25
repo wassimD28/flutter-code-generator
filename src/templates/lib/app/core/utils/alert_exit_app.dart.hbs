@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:store_go/app/core/theme/ui_config.dart';
-import 'package:store_go/app/shared/extensions/buttons/outlined_button.dart';
-import 'package:store_go/app/shared/extensions/buttons/primary_button.dart';
-import 'package:store_go/app/shared/extensions/full_width_extension.dart';
-import 'package:store_go/app/shared/extensions/text_extensions.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/shared/extensions/buttons/outlined_button.dart';
+import 'package:{{ snakeCase appName }}/app/shared/extensions/buttons/primary_button.dart';
+import 'package:{{ snakeCase appName }}/app/shared/extensions/full_width_extension.dart';
+import 'package:{{ snakeCase appName }}/app/shared/extensions/text_extensions.dart';
 
 Future<bool> alertExitApp(BuildContext context) {
   Get.defaultDialog(
@@ -45,3 +45,4 @@ Future<bool> alertExitApp(BuildContext context) {
   );
   return Future.value(true);
 }
+

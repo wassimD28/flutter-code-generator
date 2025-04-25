@@ -1,12 +1,12 @@
 import 'package:get/get.dart';
-import 'package:store_go/app/core/config/app_config.dart';
-import 'package:store_go/app/core/config/routes_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/app_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/routes_config.dart';
 import 'package:logger/logger.dart';
-import 'package:store_go/app/core/services/pusher_service.dart';
-import 'package:store_go/features/auth/services/token_manager.dart';
-import 'package:store_go/features/auth/services/auth_error_handler.dart';
-import 'package:store_go/features/auth/services/notification_service.dart';
-import 'package:store_go/features/auth/services/auth_api_client.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/pusher_service.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/token_manager.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/auth_error_handler.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/notification_service.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/auth_api_client.dart';
 import 'package:jwt_decoder/jwt_decoder.dart'; // Add this dependency for JWT decoding
 
 /// Main authentication service that coordinates all auth functionality

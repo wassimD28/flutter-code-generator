@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:store_go/app/core/config/routes_config.dart';
-import 'package:store_go/app/core/data/onboarding_static.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/routes_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/data/onboarding_static.dart';
 
 class OnboardingController extends GetxController {
   late PageController pageController;
@@ -42,3 +42,4 @@ class OnboardingController extends GetxController {
     Get.offAllNamed(AppRoute.login);
   }
 }
+

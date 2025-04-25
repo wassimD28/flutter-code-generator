@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:store_go/app/shared/controllers/controller_form_field_state.dart';
-import 'package:store_go/app/core/config/routes_config.dart';
-import 'package:store_go/app/core/utils/valid_input.dart';
-import 'package:store_go/features/auth/services/auth_service.dart';
+import 'package:{{ snakeCase appName }}/app/shared/controllers/controller_form_field_state.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/routes_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/utils/valid_input.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/auth_service.dart';
 
 class LoginController extends GetxController {
   late ControllerFormFieldState emailFieldState;
@@ -96,3 +96,4 @@ class LoginController extends GetxController {
     }
   }
 }
+

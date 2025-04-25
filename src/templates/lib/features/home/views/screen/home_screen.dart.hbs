@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:store_go/features/category/controllers/category_controller.dart';
-import 'package:store_go/features/home/controllers/home_controller.dart';
-import 'package:store_go/app/core/theme/ui_config.dart';
-import 'package:store_go/app/core/theme/app_theme_colors.dart';
-import 'package:store_go/features/home/views/widgets/category_filter.dart';
-import 'package:store_go/features/home/views/widgets/custom_app_bar.dart';
-import 'package:store_go/features/home/views/widgets/product_grid.dart';
-import 'package:store_go/features/home/views/widgets/search_bar.dart';
-import 'package:store_go/features/home/views/widgets/section_header.dart';
-import 'package:store_go/features/profile/controllers/profile_controller.dart';
-import 'package:store_go/features/home/views/widgets/skeleton_loaders.dart';
+import 'package:{{ snakeCase appName }}/features/category/controllers/category_controller.dart';
+import 'package:{{ snakeCase appName }}/features/home/controllers/home_controller.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/features/home/views/widgets/category_filter.dart';
+import 'package:{{ snakeCase appName }}/features/home/views/widgets/custom_app_bar.dart';
+import 'package:{{ snakeCase appName }}/features/home/views/widgets/product_grid.dart';
+import 'package:{{ snakeCase appName }}/features/home/views/widgets/search_bar.dart';
+import 'package:{{ snakeCase appName }}/features/home/views/widgets/section_header.dart';
+import 'package:{{ snakeCase appName }}/features/profile/controllers/profile_controller.dart';
+import 'package:{{ snakeCase appName }}/features/home/views/widgets/skeleton_loaders.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());

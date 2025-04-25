@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart' as dio;
 import 'package:http_parser/http_parser.dart';
 import 'package:logger/logger.dart';
-import 'package:store_go/app/core/services/api_client.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/api_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserApiService {
@@ -83,3 +83,4 @@ class UserApiService {
     return userId;
   }
 }
+

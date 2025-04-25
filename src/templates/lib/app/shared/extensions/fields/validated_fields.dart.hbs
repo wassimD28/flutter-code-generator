@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:store_go/app/shared/controllers/controller_form_field_state.dart';
+import 'package:{{ snakeCase appName }}/app/shared/controllers/controller_form_field_state.dart';
 
 extension FormFieldExtensions on String {
   Widget validatedField(
@@ -64,3 +64,4 @@ extension FormFieldExtensions on String {
     return validatedField(context, fieldState: fieldState, obscureText: true);
   }
 }
+

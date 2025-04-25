@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:store_go/app/core/config/app_config.dart';
-import 'package:store_go/app/core/services/api_client.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/app_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/api_client.dart';
 
 /// API client specifically for authentication endpoints
 class AuthApiClient {
@@ -104,3 +104,4 @@ class AuthApiClient {
     );
   }
 }
+

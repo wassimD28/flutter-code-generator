@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:store_go/features/wishlist/models/wishlist_item_model.dart';
-import 'package:store_go/features/wishlist/repositories/wishlist_repository.dart';
+import 'package:{{ snakeCase appName }}/features/wishlist/models/wishlist_item_model.dart';
+import 'package:{{ snakeCase appName }}/features/wishlist/repositories/wishlist_repository.dart';
 
 class WishlistController extends GetxController {
   final WishlistRepository _repository;
@@ -127,3 +127,4 @@ class WishlistController extends GetxController {
     );
   }
 }
+

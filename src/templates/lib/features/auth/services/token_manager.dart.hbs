@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:store_go/app/core/config/app_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/app_config.dart';
 import 'package:synchronized/synchronized.dart';
 
 /// Manages authentication tokens - storage, refresh, validation
@@ -171,3 +171,4 @@ class TokenManager {
     });
   }
 }
+

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
-import 'package:store_go/features/auth/services/notification_service.dart';
+import 'package:{{ snakeCase appName }}/features/auth/services/notification_service.dart';
 
 /// Centralized error handling for authentication operations
 class AuthErrorHandler {
@@ -72,3 +72,4 @@ class AuthErrorHandler {
     _notificationService.showError('Session expired, please log in again');
   }
 }
+

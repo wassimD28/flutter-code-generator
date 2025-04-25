@@ -5,9 +5,9 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:store_go/app/core/config/app_notification_type.dart';
-import 'package:store_go/app/core/config/routes_config.dart';
-import 'package:store_go/app/core/services/api_client.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/app_notification_type.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/routes_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/api_client.dart';
 import 'package:synchronized/synchronized.dart';
 
 class PusherService {
@@ -304,3 +304,4 @@ class PusherService {
     );
   }
 }
+

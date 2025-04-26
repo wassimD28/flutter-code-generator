@@ -189,12 +189,16 @@ function getFileCategory(
 /**
  * Function to scan template files
  */
-function getTemplateFiles(templateFolderPath: string): ProjectStructure {
+function getTemplateFiles(
+  templateFolderPath: string,
+  templateName: string
+): ProjectStructure {
   if (!fs.existsSync(templateFolderPath)) {
     throw new Error(`Template folder not found at path: ${templateFolderPath}`);
   }
 
   console.log(`Scanning template files in: ${templateFolderPath}`);
+  console.log(`Template name to remove from paths: ${templateName}`);
 
   // Get all files recursively
   const files: string[] = [];
@@ -241,10 +245,15 @@ function getTemplateFiles(templateFolderPath: string): ProjectStructure {
       .replace(/\\/g, "/");
 
     // Remove .hbs extension if present
-    // Remove any leading directory before "lib/"
-    const cleanPath = relativePath
-      .replace(/\.hbs$/, "")
-      .replace(/^.*?(lib\/)/, "$1");
+    let cleanPath = relativePath.replace(/\.hbs$/, "");
+
+    // Remove the template name from the beginning of the path if it exists
+    // This handles cases like "fashion/android/..." -> "android/..."
+    if (templateName && cleanPath.startsWith(`${templateName}/`)) {
+      cleanPath = cleanPath.substring(templateName.length + 1);
+      console.log(
+        `Removed template name from path: ${relativePath} -> ${cleanPath}`);
+    }
 
     // Generate better name
     const prettyName = getComponentNameFromPath(cleanPath);
@@ -291,11 +300,12 @@ function getTemplateFiles(templateFolderPath: string): ProjectStructure {
 /**
  * Parse command line arguments
  */
-function parseArgs(): { input: string; output: string } {
+function parseArgs(): { input: string; output: string; template: string } {
   // Define the default values
   const defaults = {
     input: "src/templates",
     output: "config.json",
+    template: "",
   };
 
   // Create an argument parser
@@ -309,6 +319,8 @@ function parseArgs(): { input: string; output: string } {
       parsedArgs.input = args[++i];
     } else if (arg === "--output" || arg === "-o") {
       parsedArgs.output = args[++i];
+    } else if (arg === "--template" || arg === "-t") {
+      parsedArgs.template = args[++i];
     } else if (arg === "--help" || arg === "-h") {
       console.log(`
 Template Scanner - Analyzes project template structures
@@ -317,9 +329,10 @@ Usage:
   node template-scanner.js [options]
 
 Options:
-  -i, --input <path>   Input template folder path (default: ${defaults.input})
-  -o, --output <path>  Output config file path (default: ${defaults.output})
-  -h, --help           Show this help message
+  -i, --input <path>     Input templates folder path (default: ${defaults.input})
+  -o, --output <path>    Output config file path (default: ${defaults.output})
+  -t, --template <name>  Template name to scan (default: scan all templates)
+  -h, --help             Show this help message
       `);
       process.exit(0);
     }
@@ -330,6 +343,8 @@ Options:
     input:
       parsedArgs.input || process.env.TEMPLATE_FOLDER_PATH || defaults.input,
     output: parsedArgs.output || process.env.CONFIG_PATH || defaults.output,
+    template:
+      parsedArgs.template || process.env.TEMPLATE_NAME || defaults.template,
   };
 }
 
@@ -341,7 +356,18 @@ function main() {
     console.log("Starting template scanner...");
 
     // Parse command line arguments
-    const { input: templateFolderPath, output: configPath } = parseArgs();
+    const {
+      input: templatesBasePath,
+      output: configPath,
+      template: templateName,
+    } = parseArgs();
+
+    // Determine the actual path to scan based on template name
+    let templateFolderPath = templatesBasePath;
+    if (templateName) {
+      templateFolderPath = path.join(templatesBasePath, templateName);
+      console.log(`Scanning specific template: ${templateName}`);
+    }
 
     console.log(`Using template folder: ${templateFolderPath}`);
     console.log(`Using output config file: ${configPath}`);
@@ -358,7 +384,7 @@ function main() {
     }
 
     // Scan template files
-    const projectStructure = getTemplateFiles(templateFolderPath);
+    const projectStructure = getTemplateFiles(templateFolderPath, templateName);
 
     // Update config
     config.projectStructure = projectStructure;

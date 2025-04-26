@@ -16,17 +16,12 @@ export class TemplateUtils {
   private templatesCache: Map<string, HandlebarsTemplateDelegate>;
 
   constructor(templatesDir?: string) {
-    // If a custom templates dir is provided, use it directly
-    // Otherwise, fall back to the default in src/templates
+    // Use the provided templates directory or fall back to default
     this.templatesDir =
       templatesDir || path.join(__dirname, "..", "..", "src", "templates");
 
-    // Debug log to confirm the template directory
     console.log(`[DEBUG] Using templates directory: ${this.templatesDir}`);
-
     this.templatesCache = new Map();
-
-    // Register Handlebars helpers
     this.registerHelpers();
   }
 
@@ -73,7 +68,7 @@ export class TemplateUtils {
   }
 
   /**
-   * Load a template from file with improved path handling
+   * Loads a template from file based on the project structure path
    */
   async loadTemplate(
     templatePath: string,
@@ -83,12 +78,9 @@ export class TemplateUtils {
       templatePath,
       projectStructure
     );
-
-    // Debug log to show the resolved template path
     console.log(
       `[DEBUG] Resolving template: ${templatePath} to path: ${resolvedPath}`
     );
-
     return await this.readTemplateFile(resolvedPath);
   }
 
@@ -97,12 +89,9 @@ export class TemplateUtils {
    */
   private async readTemplateFile(templatePath: string): Promise<string> {
     try {
-      // Check if the file exists before reading
       await fs.access(templatePath);
-      const templateContent = await fs.readFile(templatePath, "utf-8");
-      return templateContent;
+      return await fs.readFile(templatePath, "utf-8");
     } catch (error) {
-      // Enhanced error message with more debugging info
       throw new Error(
         `Template not found at path: ${templatePath}. Please ensure the template exists before running the generator. Current working directory: ${process.cwd()}`
       );
@@ -117,10 +106,8 @@ export class TemplateUtils {
     context: T,
     projectStructure: ProjectStructure = ProjectStructure.LIB
   ): Promise<string> {
-    // Generate a cache key that includes both template path and structure
     const cacheKey = `${projectStructure}:${templatePath}`;
 
-    // Check cache first
     if (!this.templatesCache.has(cacheKey)) {
       const templateSource = await this.loadTemplate(
         templatePath,
@@ -138,20 +125,19 @@ export class TemplateUtils {
   }
 
   /**
-   * Resolve the full path to a template file
-   * FIXED: Uses project structure paths directly to find HBS files
+   * Resolves the template path based on the project structure path
+   * The key insight is that template files exactly match the project structure paths
+   * but are located within the templates directory with .hbs extension
    */
   resolveTemplatePath(
     filePath: string,
     projectStructure: ProjectStructure
   ): string {
-    // This is the key fix - we look for the .hbs file that matches the path in the project structure
-    // The filePath here should be directly from the projectStructure.*.path property
-
     // Always add .hbs extension if not already there
     const hbsExt = filePath.endsWith(".hbs") ? "" : ".hbs";
 
-    // Resolve the path within the template directory
+    // Directly use the filePath from the project structure
+    // This is the core idea - the templates follow the same structure as the output
     return path.join(this.templatesDir, filePath + hbsExt);
   }
 }

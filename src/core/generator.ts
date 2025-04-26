@@ -53,7 +53,9 @@ export class FlutterAppGenerator {
 
     // Create directory structure based on projectStructure
     await this.fileUtils.createDirectoryStructure(outputDir);
-
+    this.logger.info(`Created directory structure at: ${outputDir}`);
+    await this.fileUtils.copyPlatformFolders("src/platform-folders", outputDir);
+    this.logger.info(`Copied platform folders to: ${outputDir}`);
     // Download all assets defined in config
     await this.downloadAssets(config, outputDir);
 
@@ -91,7 +93,7 @@ export class FlutterAppGenerator {
     // Generate entry point (main.dart)
     const entryPath = path.join(outputDir, structure.entry.path);
     const entryContent = await this.templateUtils.compileTemplate(
-      "main.dart.hbs",
+      structure.entry.path, // Use full path from the structure
       config
     );
     await this.fileUtils.writeFile(entryPath, entryContent);

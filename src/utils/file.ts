@@ -61,4 +61,27 @@ export class FileUtils {
       return false;
     }
   }
+  /**
+   * Copy android and ios platform folders to the output directory
+   * @param sourceDir - The source directory containing the folders to copy
+   * @param outputDir - The target output directory where the folders will be copied
+   */
+  async copyPlatformFolders(
+    sourceDir: string,
+    outputDir: string
+  ): Promise<void> {
+    const platformFolders = ["android", "ios"];
+
+    for (const folder of platformFolders) {
+      const sourcePath = path.join(sourceDir, folder);
+      const destPath = path.join(outputDir, folder);
+
+      try {
+        await fs.access(sourcePath);
+        await fs.copyFile(sourcePath, destPath);
+      } catch (error) {
+        console.error(`Error copying ${folder} folder: ${error}`);
+      }
+    }
+  }
 }

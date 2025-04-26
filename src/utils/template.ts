@@ -136,8 +136,8 @@ export class TemplateUtils {
     // Always add .hbs extension if not already there
     const hbsExt = filePath.endsWith(".hbs") ? "" : ".hbs";
 
-    // Directly use the filePath from the project structure
-    // This is the core idea - the templates follow the same structure as the output
+    // Use the full path from your project structure to find the template
+    // This ensures "lib/main.dart" becomes "src/templates/fashion/lib/main.dart.hbs"
     return path.join(this.templatesDir, filePath + hbsExt);
   }
 }

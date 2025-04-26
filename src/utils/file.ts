@@ -50,6 +50,7 @@ export class FileUtils {
     await scanDir(dir);
     return files;
   }
+
   /**
    * Check if a file exists
    */
@@ -61,8 +62,36 @@ export class FileUtils {
       return false;
     }
   }
+
   /**
-   * Copy android and ios platform folders to the output directory
+   * Recursively copy a directory and its contents
+   * @param srcDir - Source directory
+   * @param destDir - Destination directory
+   */
+  async copyDir(srcDir: string, destDir: string): Promise<void> {
+    // Create destination directory if it doesn't exist
+    await fs.mkdir(destDir, { recursive: true });
+
+    // Read all entries in the source directory
+    const entries = await fs.readdir(srcDir, { withFileTypes: true });
+
+    // Process each entry
+    for (const entry of entries) {
+      const srcPath = path.join(srcDir, entry.name);
+      const destPath = path.join(destDir, entry.name);
+
+      if (entry.isDirectory()) {
+        // Recursively copy subdirectories
+        await this.copyDir(srcPath, destPath);
+      } else {
+        // Copy files
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+  }
+
+  /**
+   * Copy platform folders (android, ios) to the output directory
    * @param sourceDir - The source directory containing the folders to copy
    * @param outputDir - The target output directory where the folders will be copied
    */
@@ -77,10 +106,15 @@ export class FileUtils {
       const destPath = path.join(outputDir, folder);
 
       try {
+        // Check if source directory exists
         await fs.access(sourcePath);
-        await fs.copyFile(sourcePath, destPath);
+
+        // Use recursive directory copying instead of file copying
+        await this.copyDir(sourcePath, destPath);
+        console.log(`Successfully copied ${folder} folder to ${destPath}`);
       } catch (error) {
         console.error(`Error copying ${folder} folder: ${error}`);
+        // Continue with the next folder instead of stopping execution
       }
     }
   }

@@ -1,6 +1,6 @@
 export class Logger {
   info(message: string): void {
-    console.log(`[INFO] ${message}`);
+    console.log(`\x1b[36m[INFO]\x1b[0m ${message}`);
   }
 
   success(message: string): void {

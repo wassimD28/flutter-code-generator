@@ -54,8 +54,19 @@ export class FlutterAppGenerator {
     // Create directory structure based on projectStructure
     await this.fileUtils.createDirectoryStructure(outputDir);
     this.logger.info(`Created directory structure at: ${outputDir}`);
-    await this.fileUtils.copyPlatformFolders("src/platform-folders", outputDir);
-    this.logger.info(`Copied platform folders to: ${outputDir}`);
+    // Update this line to pass the logger and allow errors to propagate
+    try {
+      await this.fileUtils.copyPlatformFolders(
+        "src/platform-folders",
+        outputDir,
+        this.logger
+      );
+      this.logger.info(`Copied platform folders to: ${outputDir}`);
+    } catch (error) {
+      // This will bubble up and cause the entire app generation to fail
+      this.logger.error(`Platform folders copy failed: ${error}`);
+      throw new Error(`App generation failed: Could not copy platform folders`);
+    }
     // Download all assets defined in config
     await this.downloadAssets(config, outputDir);
 

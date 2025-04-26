@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { Logger } from "../cli/logger";
 
 export class FileUtils {
   /**
@@ -97,7 +98,8 @@ export class FileUtils {
    */
   async copyPlatformFolders(
     sourceDir: string,
-    outputDir: string
+    outputDir: string,
+    logger: Logger
   ): Promise<void> {
     const platformFolders = ["android", "ios"];
 
@@ -111,10 +113,13 @@ export class FileUtils {
 
         // Use recursive directory copying instead of file copying
         await this.copyDir(sourcePath, destPath);
-        console.log(`Successfully copied ${folder} folder to ${destPath}`);
+        logger.info(`Copied ${folder} folder to ${destPath}`);
       } catch (error) {
-        console.error(`Error copying ${folder} folder: ${error}`);
-        // Continue with the next folder instead of stopping execution
+        // Use the custom logger and throw the error to stop execution
+        logger.error(
+          `Failed to copy ${folder} folder from ${sourcePath}: ${error}`
+        );
+        throw new Error(`Platform folder copy failed: ${error}`);
       }
     }
   }

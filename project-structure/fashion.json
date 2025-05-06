@@ -2,6 +2,14 @@
   "projectStructure": {
     "core": [
       {
+        "name": ".env",
+        "path": ".env"
+      },
+      {
+        "name": " Main Activity",
+        "path": "android/app/src/main/kotlin/com/example/store_go/MainActivity.kt"
+      },
+      {
         "name": "App Config",
         "path": "lib/app/core/config/app_config.dart"
       },

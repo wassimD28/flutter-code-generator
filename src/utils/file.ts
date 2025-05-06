@@ -101,7 +101,7 @@ export class FileUtils {
     outputDir: string,
     logger: Logger
   ): Promise<void> {
-    const platformFolders = ["android", "ios"];
+    const platformFolders = ["android", "ios", "assets"];
 
     for (const folder of platformFolders) {
       const sourcePath = path.join(sourceDir, folder);

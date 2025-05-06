@@ -1,4 +1,38 @@
-import { ThemeDesign } from "./theme";
+export interface ThemeColor {
+  background: string;
+  foreground: string;
+  primary: string;
+  primaryForeground: string;
+  secondary?: string;
+  secondaryForeground?: string;
+  accent?: string;
+  accentForeground?: string;
+  muted: string;
+  mutedForeground: string;
+  card: string;
+  cardForeground: string;
+  border: string;
+  input: string;
+  inputForeground: string;
+  destructive?: string;
+  destructiveForeground?: string;
+  productCard?: string;
+}
+
+// Interface for the direct light/dark theme structure in config.json
+export interface DirectThemeColors {
+  backgroundColor: string;
+  foregroundColor: string;
+  cardColor: string;
+  cardForegroundColor: string;
+  primaryColor: string;
+  primaryForegroundColor: string;
+  mutedColor: string;
+  mutedForegroundColor: string;
+  inputColor: string;
+  inputForegroundColor: string;
+  borderColor: string;
+}
 
 export interface StoreConfig {
   metadata: {
@@ -7,6 +41,8 @@ export interface StoreConfig {
     description: string;
     apiEndpoint: string;
     callbackUrl?: string;
+    storeSlogan?: string;
+    templateType?: string;
   };
   app: {
     name: string;
@@ -18,9 +54,17 @@ export interface StoreConfig {
     supportedLocales: string[];
   };
   design: {
-    theme: ThemeDesign;
+    radius: number;
+    lightTheme: DirectThemeColors;
+    darkTheme: DirectThemeColors;
   };
-  features: {
+  splashScreen: {
+    lightIconUrl: string;
+    darkIconUrl: string;
+    lightBackgroundColor: string;
+    darkBackgroundColor: string;
+  };
+  features?: {
     [key: string]: {
       enabled: boolean;
       path: string;
@@ -49,15 +93,41 @@ export interface StoreConfig {
       path: string;
     };
   };
-  assets: {
+  assets?: {
     images: Array<{ name: string; url: string; path: string }>;
     fonts: Array<{ name: string; path: string }>;
   };
 }
 
-// The processed config can remain mostly the same, but adapt it to derive
-// values from the new structure
+// The processed config adds derived values
 export interface ProcessedConfig extends StoreConfig {
   appName: string; // Derived from metadata.storeName
   welcomeMessage: string;
+}
+
+// Additional mapping function to convert DirectThemeColors to ThemeColor
+export function convertDirectThemeToThemeColor(
+  directTheme: DirectThemeColors
+): ThemeColor {
+  return {
+    background: directTheme.backgroundColor,
+    foreground: directTheme.foregroundColor,
+    primary: directTheme.primaryColor,
+    primaryForeground: directTheme.primaryForegroundColor,
+    card: directTheme.cardColor,
+    cardForeground: directTheme.cardForegroundColor,
+    muted: directTheme.mutedColor,
+    mutedForeground: directTheme.mutedForegroundColor,
+    input: directTheme.inputColor,
+    inputForeground: directTheme.inputForegroundColor,
+    border: directTheme.borderColor,
+    // Set default values for optional properties
+    secondary: directTheme.cardColor, // Use card color as secondary by default
+    secondaryForeground: directTheme.cardForegroundColor,
+    accent: directTheme.primaryColor, // Use primary as accent by default
+    accentForeground: directTheme.primaryForegroundColor,
+    destructive: "#FF0000", // Default red for destructive
+    destructiveForeground: "#FFFFFF", // Default white for destructive foreground
+    productCard: directTheme.cardColor, // Use card color for product card by default
+  };
 }

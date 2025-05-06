@@ -1,6 +1,6 @@
 // Enhanced validator.ts
 import { ThemeColor, ThemeColors } from "../models/colors";
-import { StoreConfig } from "../models/config";
+import { DirectThemeColors, StoreConfig } from "../models/config";
 import { ThemeDesign } from "../models/theme";
 
 interface ValidationResult {
@@ -36,8 +36,6 @@ export class ConfigValidator {
       }
     }
 
-    // Validate design structure
-    this.validateDesign(config.design, errors);
 
     // Validate callback URL if present
     if (
@@ -57,7 +55,7 @@ export class ConfigValidator {
    * Validates the entire design structure
    */
   private validateDesign(
-    design: { theme: ThemeDesign } | undefined,
+    design: { theme: DirectThemeColors } | undefined,
     errors: string[]
   ): void {
     if (!design) {
@@ -70,17 +68,6 @@ export class ConfigValidator {
       return;
     }
 
-    // Validate theme colors
-    this.validateThemeColors(design.theme.colors, errors);
-
-    // Validate typography
-    this.validateTypography(design.theme.typography, errors);
-
-    // Validate spacing
-    this.validateSpacing(design.theme.spacing, errors);
-
-    // Validate components
-    this.validateComponents(design.theme.components, errors);
   }
 
   /**
@@ -188,140 +175,8 @@ export class ConfigValidator {
     }
   }
 
-  /**
-   * Validates component configurations
-   */
-  private validateComponents(
-    components: ThemeDesign["components"] | undefined,
-    errors: string[]
-  ): void {
-    if (!components) {
-      errors.push("Components configuration is recommended");
-      return;
-    }
+  
 
-    // Define valid color keys
-    const validColorKeys = [
-      "background",
-      "foreground",
-      "primary",
-      "primaryForeground",
-      "secondary",
-      "secondaryForeground",
-      "accent",
-      "accentForeground",
-      "muted",
-      "mutedForeground",
-      "card",
-      "cardForeground",
-      "border",
-      "input",
-      "destructive",
-      "destructiveForeground",
-      "productCard",
-    ];
-
-    // Validate inputs configuration if present
-    if (components.inputs) {
-      if (components.inputs.borderRadius === undefined) {
-        errors.push("Border radius is required for input components");
-      }
-    }
-
-    // Validate button configurations
-    const buttonTypes = [
-      "elevatedButtons",
-      "textButtons",
-      "outlinedButtons",
-    ] as const;
-
-    for (const buttonType of buttonTypes) {
-      // This ensures the type is narrowed to ButtonConfig
-      const button = components[buttonType];
-
-      if (button) {
-        if (button.borderRadius === undefined) {
-          errors.push(`Border radius is required for ${buttonType}`);
-        }
-
-        // Now TypeScript knows we're dealing with ButtonConfig which has disabledBackgroundColor
-        if (button.disabledBackgroundColor !== undefined) {
-          if (!validColorKeys.includes(button.disabledBackgroundColor)) {
-            errors.push(
-              `Invalid disabledBackgroundColor '${
-                button.disabledBackgroundColor
-              }' in ${buttonType}. Must be one of: ${validColorKeys.join(", ")}`
-            );
-          }
-        }
-      }
-    }
-  }
-  /**
-   * Validates all colors in both light and dark themes
-   */
-  private validateThemeColors(
-    colors: ThemeColors | undefined,
-    errors: string[]
-  ): void {
-    if (!colors) {
-      errors.push("Theme colors configuration is required");
-      return;
-    }
-
-    if (!colors.light) {
-      errors.push("Light theme colors are required");
-    } else {
-      this.validateColorTheme(colors.light, "light", errors);
-    }
-
-    if (!colors.dark) {
-      errors.push("Dark theme colors are required");
-    } else {
-      this.validateColorTheme(colors.dark, "dark", errors);
-    }
-  }
-
-  /**
-   * Validates all colors in a specific theme (light or dark)
-   */
-  private validateColorTheme(
-    theme: ThemeColor,
-    themeName: string,
-    errors: string[]
-  ): void {
-    // Required color properties
-    const requiredColors = [
-      "background",
-      "foreground",
-      "primary",
-      "primaryForeground",
-      "secondary",
-      "secondaryForeground",
-      "accent",
-      "muted",
-      "border",
-    ];
-
-    // Check for missing required colors
-    for (const colorName of requiredColors) {
-      if (!theme[colorName as keyof ThemeColor]) {
-        errors.push(
-          `Missing required color '${colorName}' in ${themeName} theme`
-        );
-      }
-    }
-
-    // Validate hex color format for all defined colors
-    const colorProperties = Object.entries(theme);
-    for (const [property, colorValue] of colorProperties) {
-      if (colorValue && !this.isValidHexColor(colorValue)) {
-        errors.push(
-          `Invalid color value for ${themeName}.${property}: ${colorValue}. Must be a valid hex color (e.g., #RRGGBB or #RGB).`
-        );
-      }
-    }
-  }
 
   /**
    * Checks if a string is a valid URL
@@ -335,19 +190,5 @@ export class ConfigValidator {
     }
   }
 
-  /**
-   * Validates if the provided string is a proper hexadecimal color code
-   */
-  private isValidHexColor(color: string): boolean {
-    // Check if the input is a string
-    if (typeof color !== "string") {
-      return false;
-    }
-
-    // Create a regular expression to match valid hex color patterns
-    const hexColorRegex = /^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/;
-
-    // Test the color against the regex pattern
-    return hexColorRegex.test(color);
-  }
+ 
 }

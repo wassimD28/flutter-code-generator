@@ -190,6 +190,10 @@
         "path": "lib/features/notifications/views/widgets/notification_item.dart"
       },
       {
+        "name": "On Boarding Skeleton Animation",
+        "path": "lib/features/onBoarding/views/widgets/skeleton_animation.dart"
+      },
+      {
         "name": "Product Detail State",
         "path": "lib/features/product/state/product_detail_state.dart"
       },
@@ -769,48 +773,64 @@
         "path": "lib/features/category_product/view/widgets/subcategory_list_view.dart"
       },
       {
-        "name": "Filter Product Screen",
-        "path": "lib/features/filter/view/screen/filter_product_screen.dart"
+        "name": "Filter Product Sheet",
+        "path": "lib/features/filter/view/screen/filter_product_sheet.dart"
       },
       {
-        "name": "Filter Apply Button",
-        "path": "lib/features/filter/view/widgets/apply_button.dart"
+        "name": "Category Filter",
+        "path": "lib/features/filter/view/widgets/category_filter.dart"
       },
       {
-        "name": "Filter Category Button",
-        "path": "lib/features/filter/view/widgets/category_button.dart"
+        "name": "Filter Chip",
+        "path": "lib/features/filter/view/widgets/filter_chip.dart"
       },
       {
-        "name": "Filter Category Section",
-        "path": "lib/features/filter/view/widgets/category_section.dart"
+        "name": "Filter Content",
+        "path": "lib/features/filter/view/widgets/filter_content.dart"
       },
       {
-        "name": "Filter Custom Thumb Shape",
-        "path": "lib/features/filter/view/widgets/custom_thumb_shape.dart"
+        "name": "Filter Footer",
+        "path": "lib/features/filter/view/widgets/filter_footer.dart"
       },
       {
         "name": "Filter Header",
         "path": "lib/features/filter/view/widgets/filter_header.dart"
       },
       {
-        "name": "Filter Price Range Section",
-        "path": "lib/features/filter/view/widgets/price_range_section.dart"
+        "name": "Filter Main Bottom Sheet",
+        "path": "lib/features/filter/view/widgets/main_bottom_sheet.dart"
       },
       {
-        "name": "Filter Rating Row",
-        "path": "lib/features/filter/view/widgets/rating_row.dart"
+        "name": "Filter Price Range Slider",
+        "path": "lib/features/filter/view/widgets/price_range_slider.dart"
       },
       {
-        "name": "Filter Rating Section",
-        "path": "lib/features/filter/view/widgets/rating_section.dart"
+        "name": "Rating Filter",
+        "path": "lib/features/filter/view/widgets/rating_filter.dart"
       },
       {
-        "name": "Filter Sort Section",
-        "path": "lib/features/filter/view/widgets/sort_section.dart"
+        "name": "Filter Rating Option",
+        "path": "lib/features/filter/view/widgets/rating_option.dart"
       },
       {
-        "name": "Filter Sort Tab",
-        "path": "lib/features/filter/view/widgets/sort_tab.dart"
+        "name": "Filter Results Count",
+        "path": "lib/features/filter/view/widgets/results_count.dart"
+      },
+      {
+        "name": "Filter Section Title",
+        "path": "lib/features/filter/view/widgets/section_title.dart"
+      },
+      {
+        "name": "Filter Sort Option",
+        "path": "lib/features/filter/view/widgets/sort_option.dart"
+      },
+      {
+        "name": "Subcategory Filter",
+        "path": "lib/features/filter/view/widgets/subcategory_filter.dart"
+      },
+      {
+        "name": "Filter Thumb Shape",
+        "path": "lib/features/filter/view/widgets/thumb_shape.dart"
       },
       {
         "name": "Home Screen",
@@ -929,10 +949,6 @@
         "path": "lib/features/review/view/screen/review_screen.dart"
       },
       {
-        "name": "Review Dialog Utils",
-        "path": "lib/features/review/view/widgets/dialog_utils.dart"
-      },
-      {
         "name": "Edit Review Form",
         "path": "lib/features/review/view/widgets/edit_review_form.dart"
       },
@@ -971,26 +987,6 @@
       {
         "name": "Review Section",
         "path": "lib/features/review/view/widgets/review_section/review_section.dart"
-      },
-      {
-        "name": "Review Quick Tag",
-        "path": "lib/features/review/view/widgets/review_section/widgets/quick_tag.dart"
-      },
-      {
-        "name": "Review Rating Summary",
-        "path": "lib/features/review/view/widgets/review_section/widgets/rating_summary.dart"
-      },
-      {
-        "name": "Review Form",
-        "path": "lib/features/review/view/widgets/review_section/widgets/review_form.dart"
-      },
-      {
-        "name": "Review Header",
-        "path": "lib/features/review/view/widgets/review_section/widgets/review_header.dart"
-      },
-      {
-        "name": "Write Review Button",
-        "path": "lib/features/review/view/widgets/review_section/widgets/write_review_button.dart"
       },
       {
         "name": "Settings Setting Screen",

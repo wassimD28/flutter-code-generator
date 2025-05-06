@@ -1,148 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>$(DEVELOPMENT_LANGUAGE)</string>
-    
-    <key>CFBundleDisplayName</key>
-    <string>{{metadata.storeName}}</string>
-    
-    <key>CFBundleExecutable</key>
-    <string>$(EXECUTABLE_NAME)</string>
-    
-    <key>CFBundleIdentifier</key>
-    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-    
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    
-    <key>CFBundleName</key>
-    <string>{{snakeCase metadata.storeName}}</string>
-    
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    
-    <key>CFBundleShortVersionString</key>
-    <string>$(FLUTTER_BUILD_NAME)</string>
-    
-    <key>CFBundleSignature</key>
-    <string>????</string>
-    
-    <key>CFBundleVersion</key>
-    <string>$(FLUTTER_BUILD_NUMBER)</string>
-    
-    <key>LSRequiresIPhoneOS</key>
-    <true/>
-    
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
-    
-    <key>UIMainStoryboardFile</key>
-    <string>Main</string>
-    
-    <key>UISupportedInterfaceOrientations</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    
-    <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
-    
-    <!-- URL Schemes Configuration -->
-    <key>CFBundleURLTypes</key>
-    <array>
-        <!-- App's main URL scheme -->
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>{{app.bundleId}}</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>{{app.bundleId}}</string>
-            </array>
-        </dict>
-        
-        {{#if features.socialLogin.enabled}}
-        {{#if features.socialLogin.content.facebook}}
-        <!-- Facebook URL scheme -->
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>fb{{features.socialLogin.content.facebook.appId}}</string>
-            </array>
-        </dict>
-        {{/if}}
-        {{/if}}
-        
-        <!-- Reset password URL scheme -->
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>reset-password</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>{{slugify metadata.storeName}}.reset</string>
-            </array>
-        </dict>
-    </array>
-    
-    {{#if features.socialLogin.enabled}}
-    {{#if features.socialLogin.content.facebook}}
-    <!-- Facebook Configuration -->
-    <key>FacebookAppID</key>
-    <string>{{features.socialLogin.content.facebook.appId}}</string>
-    
-    <key>FacebookClientToken</key>
-    <string>{{features.socialLogin.content.facebook.clientToken}}</string>
-    
-    <key>FacebookDisplayName</key>
-    <string>{{metadata.storeName}}</string>
-    
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>fbapi</string>
-        <string>fb-messenger-share-api</string>
-    </array>
-    {{/if}}
-    {{/if}}
-    
-    {{#if features.camera.enabled}}
-    <!-- Camera Usage Description -->
-    <key>NSCameraUsageDescription</key>
-    <string>This app needs access to your camera to take photos for profile pictures and product images.</string>
-    {{/if}}
-    
-    {{#if features.photoLibrary.enabled}}
-    <!-- Photo Library Usage Description -->
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs access to your photo library to select images for profile pictures and product images.</string>
-    {{/if}}
-    
-    {{#if features.location.enabled}}
-    <!-- Location Usage Description -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to your location to show nearby stores and delivery options.</string>
-    {{/if}}
-    
-    <key>UIStatusBarHidden</key>
-    <false/>
-</dict>
+	<dict>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>{{metadata.storeName}}</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>{{snakeCase metadata.storeName}}</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleVersion</key>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true/>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array/>
+				<key>CFBundleURLName</key>
+				<string>reset-password</string>
+			</dict>
+		</array>
+		<key>UIStatusBarHidden</key>
+		<false/>
+	</dict>
 </plist>

@@ -65,6 +65,13 @@ export class TemplateUtils {
       }
       return slug;
     });
+
+    // New helper to remove '#' from hex color codes
+    Handlebars.registerHelper("stripHexHash", (hexColor: string) => {
+      if (typeof hexColor !== "string") return "";
+      // Remove the '#' if it exists at the beginning of the string
+      return hexColor.replace(/^#/, "");
+    });
   }
 
   /**

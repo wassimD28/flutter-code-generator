@@ -8,46 +8,46 @@ import 'package:{{ snakeCase appName }}/app/core/theme/app_typography_extension.
 class AppTheme {
   // Light theme colors based on config
   static const lightColors = AppColorsData(
-    background: Color(0xFF{{design.lightTheme.backgroundColor.substring(1)}}),
-    foreground: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
-    primary: Color(0xFF{{design.lightTheme.primaryColor.substring(1)}}),
-    primaryForeground: Color(0xFF{{design.lightTheme.primaryForegroundColor.substring(1)}}),
-    secondary: Color(0xFFd38d56), // Use card color as secondary
-    secondaryForeground: Color(0xFF{{design.lightTheme.cardForegroundColor.substring(1)}}),
-    accent: Color(0xFF{{design.lightTheme.primaryColor.substring(1)}}), // Use primary color as accent
-    accentForeground: Color(0xFF{{design.lightTheme.primaryForegroundColor.substring(1)}}),
-    muted: Color(0xFF{{design.lightTheme.mutedColor.substring(1)}}),
-    mutedForeground: Color(0xFF{{design.lightTheme.mutedForegroundColor.substring(1)}}),
-    card: Color(0xFF{{design.lightTheme.cardColor.substring(1)}}),
-    cardForeground: Color(0xFF{{design.lightTheme.cardForegroundColor.substring(1)}}),
-    border: Color(0xFF{{design.lightTheme.borderColor.substring(1)}}),
-    input: Color(0xFF{{design.lightTheme.inputColor.substring(1)}}),
-    inputForeground: Color(0xFF{{design.lightTheme.inputForegroundColor.substring(1)}}),
+    background: Color(0xFF{{stripHexHash design.lightTheme.backgroundColor}}),
+    foreground: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
+    primary: Color(0xFF{{stripHexHash design.lightTheme.primaryColor}}),
+    primaryForeground: Color(0xFF{{stripHexHash design.lightTheme.primaryForegroundColor}}),
+    secondary: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}), // Use card color as secondary
+    secondaryForeground: Color(0xFF{{stripHexHash design.lightTheme.cardForegroundColor}}),
+    accent: Color(0xFF{{stripHexHash design.lightTheme.primaryColor}}), // Use primary color as accent
+    accentForeground: Color(0xFF{{stripHexHash design.lightTheme.primaryForegroundColor}}),
+    muted: Color(0xFF{{stripHexHash design.lightTheme.mutedColor}}),
+    mutedForeground: Color(0xFF{{stripHexHash design.lightTheme.mutedForegroundColor}}),
+    card: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}),
+    cardForeground: Color(0xFF{{stripHexHash design.lightTheme.cardForegroundColor}}),
+    border: Color(0xFF{{stripHexHash design.lightTheme.borderColor}}),
+    input: Color(0xFF{{stripHexHash design.lightTheme.inputColor}}),
+    inputForeground: Color(0xFF{{stripHexHash design.lightTheme.inputForegroundColor}}),
     destructive: Color(0xFFFF0000), // Keep default destructive color
     destructiveForeground: Color(0xFFFFFFFF), // Keep default destructive foreground
-    productCard: Color(0xFF{{design.lightTheme.cardColor.substring(1)}}), // Use card color for product card
+    productCard: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}), // Use card color for product card
   );
 
   // Dark theme colors based on config
   static const darkColors = AppColorsData(
-    background: Color(0xFF{{design.darkTheme.backgroundColor.substring(1)}}),
-    foreground: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
-    primary: Color(0xFF{{design.darkTheme.primaryColor.substring(1)}}),
-    primaryForeground: Color(0xFF{{design.darkTheme.primaryForegroundColor.substring(1)}}),
-    secondary: Color(0xFF{{design.darkTheme.cardColor.substring(1)}}), // Use card color as secondary
-    secondaryForeground: Color(0xFF{{design.darkTheme.cardForegroundColor.substring(1)}}),
-    accent: Color(0xFF{{design.darkTheme.primaryColor.substring(1)}}), // Use primary color as accent
-    accentForeground: Color(0xFF{{design.darkTheme.primaryForegroundColor.substring(1)}}),
-    muted: Color(0xFF{{design.darkTheme.mutedColor.substring(1)}}),
-    mutedForeground: Color(0xFF{{design.darkTheme.mutedForegroundColor.substring(1)}}),
-    card: Color(0xFF{{design.darkTheme.cardColor.substring(1)}}),
-    cardForeground: Color(0xFF{{design.darkTheme.cardForegroundColor.substring(1)}}),
-    border: Color(0xFF{{design.darkTheme.borderColor.substring(1)}}),
-    input: Color(0xFF{{design.darkTheme.inputColor.substring(1)}}),
-    inputForeground: Color(0xFF{{design.darkTheme.inputForegroundColor.substring(1)}}),
+    background: Color(0xFF{{stripHexHash design.darkTheme.backgroundColor}}),
+    foreground: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
+    primary: Color(0xFF{{stripHexHash design.darkTheme.primaryColor}}),
+    primaryForeground: Color(0xFF{{stripHexHash design.darkTheme.primaryForegroundColor}}),
+    secondary: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}), // Use card color as secondary
+    secondaryForeground: Color(0xFF{{stripHexHash design.darkTheme.cardForegroundColor}}),
+    accent: Color(0xFF{{stripHexHash design.darkTheme.primaryColor}}), // Use primary color as accent
+    accentForeground: Color(0xFF{{stripHexHash design.darkTheme.primaryForegroundColor}}),
+    muted: Color(0xFF{{stripHexHash design.darkTheme.mutedColor}}),
+    mutedForeground: Color(0xFF{{stripHexHash design.darkTheme.mutedForegroundColor}}),
+    card: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}),
+    cardForeground: Color(0xFF{{stripHexHash design.darkTheme.cardForegroundColor}}),
+    border: Color(0xFF{{stripHexHash design.darkTheme.borderColor}}),
+    input: Color(0xFF{{stripHexHash design.darkTheme.inputColor}}),
+    inputForeground: Color(0xFF{{stripHexHash design.darkTheme.inputForegroundColor}}),
     destructive: Color(0xFFff1a1a), // Keep default destructive color
     destructiveForeground: Color(0xFFFFFFFF), // Keep default destructive foreground
-    productCard: Color(0xFF{{design.darkTheme.cardColor.substring(1)}}), // Use card color for product card
+    productCard: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}), // Use card color for product card
   );
 
   // Light theme text styles
@@ -57,49 +57,49 @@ class AppTheme {
       fontSize: UIConfig.fontSize3XLarge,
       fontWeight: AppTypography.bold,
       letterSpacing: AppTypography.letterSpacingTight,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     h2: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSize2XLarge,
       fontWeight: AppTypography.bold,
       letterSpacing: AppTypography.letterSpacingTight,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     h3: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeXLarge,
       fontWeight: AppTypography.semiBold,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     h4: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeLarge,
       fontWeight: AppTypography.semiBold,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     h5: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeMedium,
       fontWeight: AppTypography.semiBold,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     subtitle1: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeMedium,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     subtitle2: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeRegular,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     bodyLarge: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -107,7 +107,7 @@ class AppTheme {
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
       height: AppTypography.lineHeightNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     bodyMedium: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -115,7 +115,7 @@ class AppTheme {
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
       height: AppTypography.lineHeightNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     bodySmall: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -123,28 +123,28 @@ class AppTheme {
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
       height: AppTypography.lineHeightNormal,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     buttonText: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeRegular,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingWide,
-      color: Color(0xFF{{design.lightTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     ),
     caption: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeSmall,
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.lightTheme.mutedForegroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.mutedForegroundColor}}),
     ),
     overline: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeSmall,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingWide,
-      color: Color(0xFF{{design.lightTheme.mutedForegroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.lightTheme.mutedForegroundColor}}),
       height: 1.5,
     ),
   );
@@ -156,49 +156,49 @@ class AppTheme {
       fontSize: UIConfig.fontSize3XLarge,
       fontWeight: AppTypography.bold,
       letterSpacing: AppTypography.letterSpacingTight,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     h2: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSize2XLarge,
       fontWeight: AppTypography.bold,
       letterSpacing: AppTypography.letterSpacingTight,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     h3: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeXLarge,
       fontWeight: AppTypography.semiBold,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     h4: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeLarge,
       fontWeight: AppTypography.semiBold,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     h5: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeMedium,
       fontWeight: AppTypography.semiBold,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     subtitle1: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeMedium,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     subtitle2: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeRegular,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     bodyLarge: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -206,7 +206,7 @@ class AppTheme {
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
       height: AppTypography.lineHeightNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     bodyMedium: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -214,7 +214,7 @@ class AppTheme {
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
       height: AppTypography.lineHeightNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     bodySmall: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -222,28 +222,28 @@ class AppTheme {
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
       height: AppTypography.lineHeightNormal,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     buttonText: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeRegular,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingWide,
-      color: Color(0xFF{{design.darkTheme.foregroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     ),
     caption: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeSmall,
       fontWeight: AppTypography.regular,
       letterSpacing: AppTypography.letterSpacingNormal,
-      color: Color(0xFF{{design.darkTheme.mutedForegroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.mutedForegroundColor}}),
     ),
     overline: TextStyle(
       fontFamily: AppTypography.primaryFont,
       fontSize: UIConfig.fontSizeSmall,
       fontWeight: AppTypography.medium,
       letterSpacing: AppTypography.letterSpacingWide,
-      color: Color(0xFF{{design.darkTheme.mutedForegroundColor.substring(1)}}),
+      color: Color(0xFF{{stripHexHash design.darkTheme.mutedForegroundColor}}),
       height: 1.5,
     ),
   );
@@ -262,7 +262,6 @@ class AppTheme {
   static ThemeData _createTheme(
     AppColorsData colors,
     AppTextStylesData textStyles,
-    double borderRadius,
   ) {
     return ThemeData(
       brightness:

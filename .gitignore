@@ -3,5 +3,6 @@
 /generated-app
 /dist
 config.json
+quick-config.json
 config copy.json
 /templates

@@ -39,10 +39,8 @@ export interface StoreConfig {
     storeId: string;
     storeName: string;
     description: string;
-    apiEndpoint: string;
-    callbackUrl?: string;
-    storeSlogan?: string;
-    templateType?: string;
+    storeSlogan: string;
+    templateType: string;
   };
   app: {
     name: string;
@@ -59,8 +57,6 @@ export interface StoreConfig {
     darkTheme: DirectThemeColors;
   };
   splashScreen: {
-    lightIconUrl: string;
-    darkIconUrl: string;
     lightBackgroundColor: string;
     darkBackgroundColor: string;
   };
@@ -95,7 +91,6 @@ export interface StoreConfig {
   };
   assets?: {
     images: Array<{ name: string; url: string; path: string }>;
-    fonts: Array<{ name: string; path: string }>;
   };
 }
 

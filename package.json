@@ -14,7 +14,8 @@
     "generate:custom": "ts-node src/index.ts",
     "scan:help": "ts-node scripts/ts/template-scanner.ts --help",
     "scan:fashion": "ts-node scripts/ts/template-scanner.ts --input src/templates/fashion --output project-structure/fashion.json",
-    "check:struct": "ts-node scripts/ts/structure-checker.ts"
+    "check:struct": "ts-node scripts/ts/structure-checker.ts",
+    "convert:to-store": "ts-node scripts/ts/config-converter.ts --input quick-config.json --output config.json"
   },
   "keywords": [
     "flutter",

@@ -33,6 +33,7 @@ export function convertToQuickBuildConfig(
   const radius = getNearestAllowedRadius(storeConfig.design.radius);
 
   return {
+    baseUrl: storeConfig.metadata.baseUrl,
     buildType: "quick_build",
     storeId: storeConfig.metadata.storeId,
     appName: storeConfig.metadata.storeName,
@@ -86,6 +87,7 @@ export function convertToStoreConfig(
 ): StoreConfig {
   return {
     metadata: {
+      baseUrl: "",
       storeId: quickConfig.storeId,
       storeName: quickConfig.appName,
       description: quickConfig.appDescription,

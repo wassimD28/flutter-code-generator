@@ -39,10 +39,10 @@ export class ConfigValidator {
 
     // Validate callback URL if present
     if (
-      config.metadata.callbackUrl &&
-      !this.isValidUrl(config.metadata.callbackUrl)
+      config.metadata.baseUrl &&
+      !this.isValidUrl(config.metadata.baseUrl)
     ) {
-      errors.push("callbackUrl must be a valid URL");
+      errors.push("baseUrl must be a valid URL");
     }
 
     return {

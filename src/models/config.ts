@@ -41,6 +41,7 @@ export interface StoreConfig {
     description: string;
     storeSlogan: string;
     templateType: string;
+    baseUrl: string;
   };
   app: {
     name: string;

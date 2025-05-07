@@ -47,27 +47,47 @@ jobs:
           cat generated-app/pubspec.yaml
           echo "::set-output name=app_path::generated-app"
 
-      - name: Installing app dependencies
-        run: |
-          cd generated-app
-          flutter pub get
-      - name: Generate app icon
-        run: |
-          flutter pub run flutter_launcher_icons:main
-      - name: Generate app splash
-        run: |
-          flutter pub run flutter_native_splash:create
+      # Set up Flutter BEFORE using any Flutter commands
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.10.0"
+          
+      - name: Installing app dependencies
+        id: dependencies
+        continue-on-error: true  # Continue even if this step fails
+        run: |
+          cd generated-app
+          flutter pub get
+          
+      - name: Generate app icon
+        id: icon
+        if: steps.dependencies.outcome == 'success'
+        continue-on-error: true
+        run: |
+          cd generated-app
+          flutter pub run flutter_launcher_icons:main
+          
+      - name: Generate app splash
+        id: splash
+        if: steps.icon.outcome == 'success'
+        continue-on-error: true
+        run: |
+          cd generated-app
+          flutter pub run flutter_native_splash:create
 
       - name: Build APK
+        id: build_apk
+        if: steps.splash.outcome == 'success'
+        continue-on-error: true
         run: |
+          cd generated-app
           flutter build apk --release
 
       - name: Upload APK to ImageKit
         id: imagekit_upload
+        if: steps.build_apk.outcome == 'success'
+        continue-on-error: true
         env:
           IMAGEKIT_PUBLIC_KEY: ${{ secrets.IMAGEKIT_PUBLIC_KEY }}
           IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
@@ -87,26 +107,39 @@ jobs:
           DOWNLOAD_URL=$(echo "$UPLOAD_RESULT" | grep -o '"url":"[^"]*"' | sed 's/"url":"//;s/"//')
 
           # Set output variable for use in next step
-          echo "::set-output name=download_url::$DOWNLOAD_URL"
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
           echo "APK uploaded to: $DOWNLOAD_URL"
 
       - name: Upload APK as GitHub artifact (backup)
+        if: steps.build_apk.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: generated-app/build/app/outputs/flutter-apk/app-release.apk
 
+      # Always send a callback, regardless of previous step outcomes
       - name: Send completion callback
+        if: always()
         run: |
-          # Use the ImageKit URL from the previous step
-          DOWNLOAD_URL="${{ steps.imagekit_upload.outputs.download_url }}"
-
-          # Send callback with status update
+          STATUS="FAILED"
+          PROGRESS=0
+          MESSAGE="Flutter app generation failed"
+          
+          # If APK was successfully built and uploaded
+          if [[ "${{ steps.imagekit_upload.outcome }}" == "success" && "${{ steps.imagekit_upload.outputs.download_url }}" != "" ]]; then
+            STATUS="COMPLETED"
+            PROGRESS=100
+            MESSAGE="Flutter app generation completed successfully"
+            DOWNLOAD_URL="${{ steps.imagekit_upload.outputs.download_url }}"
+          fi
+          
+          # Send callback with appropriate status
           curl -X POST "${{ github.event.inputs.callbackUrl }}" \
             -H "Content-Type: application/json" \
             -d '{
               "jobId": "${{ github.event.inputs.jobId }}",
-              "status": "COMPLETED",
-              "downloadUrl": "'"$DOWNLOAD_URL"'",
-              "progress": 100
+              "status": "'"$STATUS"'",
+              "downloadUrl": "'"${DOWNLOAD_URL:-""}"'",
+              "progress": '"$PROGRESS"',
+              "message": "'"$MESSAGE"'"
             }'

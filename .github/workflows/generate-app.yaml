@@ -163,37 +163,38 @@ jobs:
           IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
           IMAGEKIT_URL_ENDPOINT: ${{ secrets.IMAGEKIT_URL_ENDPOINT }}
         run: |
-          # Install ImageKit upload tool
-          npm install -g imagekit-cli
-
-          # Set APK filename with storeId and jobId for unique identification
-          APK_FILENAME="app-${{ github.event.inputs.storeId }}-${{ github.event.inputs.jobId }}.apk"
-
-          # Use ImageKit CLI to upload the APK
-          APK_PATH="generated-app/build/app/outputs/flutter-apk/app-release.apk"
-          
-          echo "Uploading APK from path: $APK_PATH"
-          
-          if [ ! -f "$APK_PATH" ]; then
-            echo "Error: APK file not found at $APK_PATH"
-            exit 1
-          fi
-          
-          UPLOAD_RESULT=$(imagekit upload --file "$APK_PATH" --fileName "$APK_FILENAME" --folder "/store-apps" --usePrivateKey)
-          
-          echo "Upload result: $UPLOAD_RESULT"
-
-          # Extract the URL from the upload result using grep and sed
-          DOWNLOAD_URL=$(echo "$UPLOAD_RESULT" | grep -o '"url":"[^"]*"' | sed 's/"url":"//;s/"//')
-          
+          npm install imagekit
+          cat <<EOF > upload.js
+          const ImageKit = require('imagekit');
+          const fs = require('fs').promises;
+          const imagekit = new ImageKit({
+            publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+            privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+            urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
+          });
+          async function upload() {
+            const apkPath = 'generated-app/build/app/outputs/flutter-apk/app-release.apk';
+            const file = await fs.readFile(apkPath);
+            const result = await imagekit.upload({
+              file: file,
+              fileName: 'app-${{ github.event.inputs.storeId }}-${{ github.event.inputs.jobId }}.apk',
+              folder: '/store-apps'
+            });
+            console.log(result.url);
+          }
+          upload().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
+          DOWNLOAD_URL=$(node upload.js)
           if [ -n "$DOWNLOAD_URL" ]; then
             echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
             echo "APK uploaded to: $DOWNLOAD_URL"
           else
-            echo "Failed to extract download URL from the upload result"
+            echo "Failed to upload APK"
             exit 1
           fi
-
       - name: Upload APK as GitHub artifact (backup)
         if: steps.build_apk.outcome == 'success'
         uses: actions/upload-artifact@v4

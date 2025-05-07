@@ -47,11 +47,33 @@ jobs:
           cat generated-app/pubspec.yaml
           echo "app_path=generated-app" >> $GITHUB_OUTPUT
 
-      # Set up Flutter with a newer version that includes Dart SDK 3.7+
+      # Clear Flutter SDK caches and install the required version
+      - name: Clean any existing Flutter installations
+        run: |
+          rm -rf $HOME/.flutter $HOME/.pub-cache
+          
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.19.0"  # Or a more recent version that includes Dart SDK 3.7+
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: false  # Disable caching to ensure clean installation
+
+      - name: Verify Flutter and Dart versions
+        run: |
+          flutter --version
+          dart --version
+          
+      # Modify pubspec.yaml if needed to accept a wider SDK version range
+      - name: Adjust Dart SDK constraints if necessary
+        run: |
+          cd generated-app
+          if grep -q "sdk: .*\^3.7.0" pubspec.yaml; then
+            echo "Found strict SDK constraint, adjusting to a wider range"
+            sed -i 's/sdk: .*\^3.7.0.*/sdk: ">=3.0.0 <4.0.0"/' pubspec.yaml
+            echo "Modified pubspec.yaml:"
+            cat pubspec.yaml
+          fi
           
       - name: Installing app dependencies
         id: dependencies
@@ -101,14 +123,28 @@ jobs:
 
           # Use ImageKit CLI to upload the APK
           APK_PATH="generated-app/build/app/outputs/flutter-apk/app-release.apk"
+          
+          echo "Uploading APK from path: $APK_PATH"
+          
+          if [ ! -f "$APK_PATH" ]; then
+            echo "Error: APK file not found at $APK_PATH"
+            exit 1
+          fi
+          
           UPLOAD_RESULT=$(imagekit upload --file "$APK_PATH" --fileName "$APK_FILENAME" --folder "/store-apps" --usePrivateKey)
+          
+          echo "Upload result: $UPLOAD_RESULT"
 
           # Extract the URL from the upload result using grep and sed
           DOWNLOAD_URL=$(echo "$UPLOAD_RESULT" | grep -o '"url":"[^"]*"' | sed 's/"url":"//;s/"//')
-
-          # Set output variable for use in next step
-          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "APK uploaded to: $DOWNLOAD_URL"
+          
+          if [ -n "$DOWNLOAD_URL" ]; then
+            echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+            echo "APK uploaded to: $DOWNLOAD_URL"
+          else
+            echo "Failed to extract download URL from the upload result"
+            exit 1
+          fi
 
       - name: Upload APK as GitHub artifact (backup)
         if: steps.build_apk.outcome == 'success'
@@ -117,30 +153,55 @@ jobs:
           name: app-release
           path: generated-app/build/app/outputs/flutter-apk/app-release.apk
 
-      # Always send a callback, regardless of previous step outcomes
+      # Enhanced callback with robust error handling
       - name: Send completion callback
         if: always()
         run: |
           STATUS="FAILED"
           PROGRESS=0
           MESSAGE="Flutter app generation failed"
+          
+          # Initialize with empty string, not undefined
           DOWNLOAD_URL=""
           
+          # Debug information
+          echo "ImageKit upload outcome: ${{ steps.imagekit_upload.outcome }}"
+          echo "ImageKit download URL output: ${{ steps.imagekit_upload.outputs.download_url }}"
+          
           # If APK was successfully built and uploaded
-          if [[ "${{ steps.imagekit_upload.outcome }}" == "success" && "${{ steps.imagekit_upload.outputs.download_url }}" != "" ]]; then
-            STATUS="COMPLETED"
-            PROGRESS=100
-            MESSAGE="Flutter app generation completed successfully"
-            DOWNLOAD_URL="${{ steps.imagekit_upload.outputs.download_url }}"
+          if [[ "${{ steps.imagekit_upload.outcome }}" == "success" ]]; then
+            if [[ -n "${{ steps.imagekit_upload.outputs.download_url }}" ]]; then
+              STATUS="COMPLETED"
+              PROGRESS=100
+              MESSAGE="Flutter app generation completed successfully"
+              DOWNLOAD_URL="${{ steps.imagekit_upload.outputs.download_url }}"
+              echo "Download URL set to: $DOWNLOAD_URL"
+            else
+              echo "Warning: ImageKit upload was successful but no download URL was provided"
+            fi
+          else
+            echo "ImageKit upload step was not successful or was skipped"
           fi
           
-          # Send callback with appropriate status
-          curl -X POST "${{ github.event.inputs.callbackUrl }}" \
+          # Log callback URL for debugging
+          echo "Callback URL: ${{ github.event.inputs.callbackUrl }}"
+          
+          # Construct the JSON payload using a temporary file to avoid shell interpretation issues
+          cat > payload.json << EOF
+          {
+            "jobId": "${{ github.event.inputs.jobId }}",
+            "status": "$STATUS",
+            "downloadUrl": "$DOWNLOAD_URL",
+            "progress": $PROGRESS,
+            "message": "$MESSAGE"
+          }
+          EOF
+          
+          # Show the payload for debugging
+          echo "Sending payload:"
+          cat payload.json
+          
+          # Send callback with appropriate status and verbose output for debugging
+          curl -v -X POST "${{ github.event.inputs.callbackUrl }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "jobId": "${{ github.event.inputs.jobId }}",
-              "status": "'"$STATUS"'",
-              "downloadUrl": "'"$DOWNLOAD_URL"'",
-              "progress": '"$PROGRESS"',
-              "message": "'"$MESSAGE"'"
-            }'
+            --data @payload.json

@@ -55,7 +55,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: '3.19.3'  # Updated to a newer version
           channel: 'stable'
           cache: false  # Disable caching to ensure clean installation
 
@@ -64,16 +64,20 @@ jobs:
           flutter --version
           dart --version
           
-      # Modify pubspec.yaml if needed to accept a wider SDK version range
-      - name: Adjust Dart SDK constraints if necessary
+      # Update the dependency constraints in pubspec.yaml
+      - name: Adjust dependencies in pubspec.yaml
         run: |
           cd generated-app
-          if grep -q "sdk: .*\^3.7.0" pubspec.yaml; then
-            echo "Found strict SDK constraint, adjusting to a wider range"
-            sed -i 's/sdk: .*\^3.7.0.*/sdk: ">=3.0.0 <4.0.0"/' pubspec.yaml
-            echo "Modified pubspec.yaml:"
-            cat pubspec.yaml
+          # First, update the SDK constraints
+          sed -i 's/sdk: ".*"/sdk: ">=2.19.0 <4.0.0"/' pubspec.yaml
+          
+          # Then update flutter_lints to a compatible version
+          if grep -q "flutter_lints:" pubspec.yaml; then
+            sed -i 's/flutter_lints: .*/flutter_lints: ^2.0.0/' pubspec.yaml
           fi
+          
+          echo "Modified pubspec.yaml:"
+          cat pubspec.yaml
           
       - name: Installing app dependencies
         id: dependencies
@@ -153,7 +157,7 @@ jobs:
           name: app-release
           path: generated-app/build/app/outputs/flutter-apk/app-release.apk
 
-      # Enhanced callback with robust error handling
+      # Enhanced callback with robust error handling and URL validation
       - name: Send completion callback
         if: always()
         run: |
@@ -183,8 +187,15 @@ jobs:
             echo "ImageKit upload step was not successful or was skipped"
           fi
           
-          # Log callback URL for debugging
-          echo "Callback URL: ${{ github.event.inputs.callbackUrl }}"
+          # Validate callback URL - don't proceed if it's undefined
+          CALLBACK_URL="${{ github.event.inputs.callbackUrl }}"
+          
+          if [[ "$CALLBACK_URL" == *"undefined"* || -z "$CALLBACK_URL" ]]; then
+            echo "Error: Invalid callback URL: $CALLBACK_URL"
+            exit 1
+          fi
+          
+          echo "Callback URL: $CALLBACK_URL"
           
           # Construct the JSON payload using a temporary file to avoid shell interpretation issues
           cat > payload.json << EOF
@@ -202,6 +213,6 @@ jobs:
           cat payload.json
           
           # Send callback with appropriate status and verbose output for debugging
-          curl -v -X POST "${{ github.event.inputs.callbackUrl }}" \
+          curl -v -X POST "$CALLBACK_URL" \
             -H "Content-Type: application/json" \
             --data @payload.json

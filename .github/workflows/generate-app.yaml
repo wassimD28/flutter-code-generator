@@ -65,7 +65,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.25.0'  # Update to a version with Dart SDK 3.7.0+
           channel: 'stable'
           cache: false  # Disable caching to ensure clean installation
 

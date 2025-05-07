@@ -1,0 +1,79 @@
+name: Generate Flutter App
+
+on:
+  workflow_dispatch:
+    inputs:
+      jobId:
+        description: 'Job ID for tracking'
+        required: true
+      storeId:
+        description: 'Store ID'
+        required: true
+      callbackUrl:
+        description: 'Callback URL for status updates'
+        required: true
+      config:
+        description: 'Store configuration JSON'
+        required: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create config file
+        run: |
+          echo '${{ github.event.inputs.config }}' > config.json
+
+      - name: Build generator
+        run: npm run build
+
+      - name: Generate Flutter app
+        id: generate
+        run: |
+          npm run generate -- --config config.json --output generated-app
+          echo "::set-output name=app_path::generated-app"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+
+      - name: Build APK
+        run: |
+          cd generated-app
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release
+          path: generated-app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Send completion callback
+        run: |
+          # Upload APK to a storage service and get URL
+          # This is a placeholder - you would upload to S3, Firebase Storage, etc.
+          DOWNLOAD_URL="https://example.com/downloads/app-${{ github.event.inputs.jobId }}.apk"
+          
+          # Send callback with status update
+          curl -X POST "${{ github.event.inputs.callbackUrl }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "jobId": "${{ github.event.inputs.jobId }}",
+              "status": "COMPLETED",
+              "downloadUrl": "'"$DOWNLOAD_URL"'",
+              "progress": 100
+            }'

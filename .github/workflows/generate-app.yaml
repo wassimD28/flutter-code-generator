@@ -152,8 +152,11 @@ jobs:
         continue-on-error: true
         run: |
           cd generated-app
-          flutter build apk --release --verbose
-
+          flutter build apk --release --split-debug-info=build/symbols --verbose
+      - name: Check APK size
+        run: |
+          cd generated-app/build/app/outputs/flutter-apk
+          ls -lh app-release.apk
       - name: Upload APK to ImageKit
         id: imagekit_upload
         if: steps.build_apk.outcome == 'success'

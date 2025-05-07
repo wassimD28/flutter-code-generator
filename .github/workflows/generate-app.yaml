@@ -1,4 +1,4 @@
-name: Generate Flutter App
+name: Generate Flutter App (Improved)
 
 on:
   workflow_dispatch:
@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate callback URL
+        run: |
+          CALLBACK_URL="${{ github.event.inputs.callbackUrl }}"
+          if [[ "$CALLBACK_URL" == *"localhost"* || "$CALLBACK_URL" == *"undefined"* || -z "$CALLBACK_URL" ]]; then
+            echo "Error: Invalid callback URL: $CALLBACK_URL. Cannot use localhost in production."
+            exit 1
+          fi
+          echo "Callback URL validated: $CALLBACK_URL"
+
       - name: Create config file
         run: |
           echo '${{ github.event.inputs.config }}' > quick-config.json
@@ -52,10 +61,11 @@ jobs:
         run: |
           rm -rf $HOME/.flutter $HOME/.pub-cache
           
+      # Use a Flutter version with Dart SDK 3.7.0 or newer
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.3'  # Updated to a newer version
+          flutter-version: '3.22.0'  # Updated to a version with Dart SDK 3.7.0+
           channel: 'stable'
           cache: false  # Disable caching to ensure clean installation
 
@@ -64,12 +74,22 @@ jobs:
           flutter --version
           dart --version
           
-      # Update the dependency constraints in pubspec.yaml
+      # Update the dependency constraints in pubspec.yaml with more comprehensive error handling
       - name: Adjust dependencies in pubspec.yaml
         run: |
           cd generated-app
-          # First, update the SDK constraints
+          echo "Original pubspec.yaml:"
+          cat pubspec.yaml
+          
+          # First, update the SDK constraints to be more permissive
           sed -i 's/sdk: ".*"/sdk: ">=2.19.0 <4.0.0"/' pubspec.yaml
+          
+          # Check for blue_market dependency and adjust if present
+          if grep -q "blue_market:" pubspec.yaml; then
+            echo "Found blue_market dependency, adjusting version constraints..."
+            # Remove specific version constraints or replace with compatible version
+            sed -i 's/blue_market:.*$/blue_market: any/' pubspec.yaml
+          fi
           
           # Then update flutter_lints to a compatible version
           if grep -q "flutter_lints:" pubspec.yaml; then
@@ -79,12 +99,40 @@ jobs:
           echo "Modified pubspec.yaml:"
           cat pubspec.yaml
           
-      - name: Installing app dependencies
+      - name: Installing app dependencies with detailed logging
         id: dependencies
         continue-on-error: true  # Continue even if this step fails
         run: |
           cd generated-app
-          flutter pub get
+          echo "Running flutter pub get with detailed output..."
+          flutter pub get --verbose > pub_get_log.txt 2>&1
+          EXIT_CODE=$?
+          
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Flutter pub get failed with exit code $EXIT_CODE"
+            echo "Error log:"
+            cat pub_get_log.txt
+            
+            # Try to fix common issues automatically
+            echo "Attempting automatic fixes..."
+            
+            # If there are specific version constraint issues, try to fix them
+            if grep -q "version solving failed" pub_get_log.txt; then
+              echo "Version solving failed, attempting to use more permissive constraints..."
+              sed -i 's/sdk: ".*"/sdk: ">=2.12.0 <4.0.0"/' pubspec.yaml
+              
+              # Remove all version constraints from dependencies
+              sed -i '/dependencies:/,/dev_dependencies:/ s/: \^.*$/: any/' pubspec.yaml
+              
+              echo "Modified pubspec.yaml after auto-fix:"
+              cat pubspec.yaml
+              
+              echo "Retrying flutter pub get..."
+              flutter pub get
+            fi
+          else
+            echo "Flutter pub get completed successfully"
+          fi
           
       - name: Generate app icon
         id: icon
@@ -108,7 +156,7 @@ jobs:
         continue-on-error: true
         run: |
           cd generated-app
-          flutter build apk --release
+          flutter build apk --release --verbose
 
       - name: Upload APK to ImageKit
         id: imagekit_upload
@@ -157,7 +205,7 @@ jobs:
           name: app-release
           path: generated-app/build/app/outputs/flutter-apk/app-release.apk
 
-      # Enhanced callback with robust error handling and URL validation
+      # Enhanced callback with robust error handling, retries and URL validation
       - name: Send completion callback
         if: always()
         run: |
@@ -184,15 +232,23 @@ jobs:
               echo "Warning: ImageKit upload was successful but no download URL was provided"
             fi
           else
-            echo "ImageKit upload step was not successful or was skipped"
+            # Determine failure point for better error message
+            if [[ "${{ steps.dependencies.outcome }}" != "success" ]]; then
+              MESSAGE="Failed to install Flutter dependencies - Dart SDK version mismatch"
+            elif [[ "${{ steps.build_apk.outcome }}" != "success" ]]; then
+              MESSAGE="Failed to build APK"
+            else
+              MESSAGE="Failed to upload APK to storage"
+            fi
           fi
           
-          # Validate callback URL - don't proceed if it's undefined
+          # Validate callback URL - don't proceed if it's invalid
           CALLBACK_URL="${{ github.event.inputs.callbackUrl }}"
           
-          if [[ "$CALLBACK_URL" == *"undefined"* || -z "$CALLBACK_URL" ]]; then
+          if [[ "$CALLBACK_URL" == *"localhost"* || "$CALLBACK_URL" == *"undefined"* || -z "$CALLBACK_URL" ]]; then
             echo "Error: Invalid callback URL: $CALLBACK_URL"
-            exit 1
+            echo "Skipping callback due to invalid URL"
+            exit 0
           fi
           
           echo "Callback URL: $CALLBACK_URL"
@@ -212,7 +268,36 @@ jobs:
           echo "Sending payload:"
           cat payload.json
           
-          # Send callback with appropriate status and verbose output for debugging
-          curl -v -X POST "$CALLBACK_URL" \
-            -H "Content-Type: application/json" \
-            --data @payload.json
+          # Send callback with retries
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          SUCCESS=false
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$SUCCESS" != "true" ]; do
+            echo "Sending callback, attempt $((RETRY_COUNT+1)) of $MAX_RETRIES"
+            
+            HTTP_STATUS=$(curl -s -o response.txt -w "%{http_code}" -X POST "$CALLBACK_URL" \
+              -H "Content-Type: application/json" \
+              --data @payload.json)
+              
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+              echo "Callback succeeded with HTTP status $HTTP_STATUS"
+              SUCCESS=true
+              break
+            else
+              echo "Callback failed with HTTP status $HTTP_STATUS"
+              echo "Response body:"
+              cat response.txt
+              
+              RETRY_COUNT=$((RETRY_COUNT+1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                WAIT_TIME=$((5 * RETRY_COUNT))
+                echo "Waiting $WAIT_TIME seconds before retry..."
+                sleep $WAIT_TIME
+              fi
+            fi
+          done
+          
+          if [ "$SUCCESS" != "true" ]; then
+            echo "All callback attempts failed."
+          fi

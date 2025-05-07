@@ -45,13 +45,13 @@ jobs:
           ls -la generated-app
           echo "Checking for pubspec.yaml:"
           cat generated-app/pubspec.yaml
-          echo "::set-output name=app_path::generated-app"
+          echo "app_path=generated-app" >> $GITHUB_OUTPUT
 
-      # Set up Flutter BEFORE using any Flutter commands
+      # Set up Flutter with a newer version that includes Dart SDK 3.7+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.10.0"
+          flutter-version: "3.19.0"  # Or a more recent version that includes Dart SDK 3.7+
           
       - name: Installing app dependencies
         id: dependencies
@@ -124,6 +124,7 @@ jobs:
           STATUS="FAILED"
           PROGRESS=0
           MESSAGE="Flutter app generation failed"
+          DOWNLOAD_URL=""
           
           # If APK was successfully built and uploaded
           if [[ "${{ steps.imagekit_upload.outcome }}" == "success" && "${{ steps.imagekit_upload.outputs.download_url }}" != "" ]]; then
@@ -139,7 +140,7 @@ jobs:
             -d '{
               "jobId": "${{ github.event.inputs.jobId }}",
               "status": "'"$STATUS"'",
-              "downloadUrl": "'"${DOWNLOAD_URL:-""}"'",
+              "downloadUrl": "'"$DOWNLOAD_URL"'",
               "progress": '"$PROGRESS"',
               "message": "'"$MESSAGE"'"
             }'

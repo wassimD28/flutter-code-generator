@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       jobId:
-        description: 'Job ID for tracking'
+        description: "Job ID for tracking"
         required: true
       storeId:
-        description: 'Store ID'
+        description: "Store ID"
         required: true
       callbackUrl:
-        description: 'Callback URL for status updates'
+        description: "Callback URL for status updates"
         required: true
       config:
-        description: 'Store configuration JSON'
+        description: "Store configuration JSON"
         required: true
 
 jobs:
@@ -26,8 +26,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'npm'
+          node-version: "16"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -48,7 +48,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
+          flutter-version: "3.10.0"
 
       - name: Build APK
         run: |
@@ -56,7 +56,31 @@ jobs:
           flutter pub get
           flutter build apk --release
 
-      - name: Upload APK
+      - name: Upload APK to ImageKit
+        id: imagekit_upload
+        env:
+          IMAGEKIT_PUBLIC_KEY: ${{ secrets.IMAGEKIT_PUBLIC_KEY }}
+          IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
+          IMAGEKIT_URL_ENDPOINT: ${{ secrets.IMAGEKIT_URL_ENDPOINT }}
+        run: |
+          # Install ImageKit upload tool
+          npm install -g imagekit-cli
+
+          # Set APK filename with storeId and jobId for unique identification
+          APK_FILENAME="app-${{ github.event.inputs.storeId }}-${{ github.event.inputs.jobId }}.apk"
+
+          # Use ImageKit CLI to upload the APK
+          APK_PATH="generated-app/build/app/outputs/flutter-apk/app-release.apk"
+          UPLOAD_RESULT=$(imagekit upload --file "$APK_PATH" --fileName "$APK_FILENAME" --folder "/store-apps" --usePrivateKey)
+
+          # Extract the URL from the upload result using grep and sed
+          DOWNLOAD_URL=$(echo "$UPLOAD_RESULT" | grep -o '"url":"[^"]*"' | sed 's/"url":"//;s/"//')
+
+          # Set output variable for use in next step
+          echo "::set-output name=download_url::$DOWNLOAD_URL"
+          echo "APK uploaded to: $DOWNLOAD_URL"
+
+      - name: Upload APK as GitHub artifact (backup)
         uses: actions/upload-artifact@v3
         with:
           name: app-release
@@ -64,10 +88,9 @@ jobs:
 
       - name: Send completion callback
         run: |
-          # Upload APK to a storage service and get URL
-          # This is a placeholder - you would upload to S3, Firebase Storage, etc.
-          DOWNLOAD_URL="https://example.com/downloads/app-${{ github.event.inputs.jobId }}.apk"
-          
+          # Use the ImageKit URL from the previous step
+          DOWNLOAD_URL="${{ steps.imagekit_upload.outputs.download_url }}"
+
           # Send callback with status update
           curl -X POST "${{ github.event.inputs.callbackUrl }}" \
             -H "Content-Type: application/json" \

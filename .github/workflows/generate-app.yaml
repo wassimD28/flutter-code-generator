@@ -65,7 +65,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.0'  # Updated to a version with Dart SDK 3.7.0+
+          flutter-version: '3.25.0'  # Update to a version with Dart SDK 3.7.0+
           channel: 'stable'
           cache: false  # Disable caching to ensure clean installation
 
@@ -74,15 +74,15 @@ jobs:
           flutter --version
           dart --version
           
-      # Update the dependency constraints in pubspec.yaml with more comprehensive error handling
+      # Update the dependency constraints in pubspec.yaml with improved regex patterns
       - name: Adjust dependencies in pubspec.yaml
         run: |
           cd generated-app
           echo "Original pubspec.yaml:"
           cat pubspec.yaml
           
-          # First, update the SDK constraints to be more permissive
-          sed -i 's/sdk: ".*"/sdk: ">=2.19.0 <4.0.0"/' pubspec.yaml
+          # First, update the SDK constraints to be more permissive with a pattern that matches non-quoted versions
+          sed -i 's/sdk: \^3\.7\.0/sdk: ">=2.19.0 <4.0.0"/' pubspec.yaml
           
           # Check for blue_market dependency and adjust if present
           if grep -q "blue_market:" pubspec.yaml; then
@@ -93,7 +93,7 @@ jobs:
           
           # Then update flutter_lints to a compatible version
           if grep -q "flutter_lints:" pubspec.yaml; then
-            sed -i 's/flutter_lints: .*/flutter_lints: ^2.0.0/' pubspec.yaml
+            sed -i 's/flutter_lints: \^5\.0\.0/flutter_lints: ^2.0.0/' pubspec.yaml
           fi
           
           echo "Modified pubspec.yaml:"
@@ -113,23 +113,20 @@ jobs:
             echo "Error log:"
             cat pub_get_log.txt
             
-            # Try to fix common issues automatically
+            # Try to fix common issues automatically with improved method
             echo "Attempting automatic fixes..."
             
-            # If there are specific version constraint issues, try to fix them
-            if grep -q "version solving failed" pub_get_log.txt; then
-              echo "Version solving failed, attempting to use more permissive constraints..."
-              sed -i 's/sdk: ".*"/sdk: ">=2.12.0 <4.0.0"/' pubspec.yaml
-              
-              # Remove all version constraints from dependencies
-              sed -i '/dependencies:/,/dev_dependencies:/ s/: \^.*$/: any/' pubspec.yaml
-              
-              echo "Modified pubspec.yaml after auto-fix:"
-              cat pubspec.yaml
-              
-              echo "Retrying flutter pub get..."
-              flutter pub get
-            fi
+            # More robust replacement for SDK constraints
+            sed -i -E 's/(sdk:[ ]*)[^\s]+/\1">=2.12.0 <4.0.0"/' pubspec.yaml
+            
+            # Remove all version constraints from dependencies with a more robust approach
+            sed -i '/dependencies:/,/dev_dependencies:/ s/: \^[0-9.]+/: any/g' pubspec.yaml
+            
+            echo "Modified pubspec.yaml after auto-fix:"
+            cat pubspec.yaml
+            
+            echo "Retrying flutter pub get..."
+            flutter pub get
           else
             echo "Flutter pub get completed successfully"
           fi

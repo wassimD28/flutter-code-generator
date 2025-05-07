@@ -34,15 +34,13 @@ jobs:
 
       - name: Create config file
         run: |
-          echo '${{ github.event.inputs.config }}' > config.json
-
-      - name: Build generator
-        run: npm run build
+          echo '${{ github.event.inputs.config }}' > quick-config.json
+          npm run convert:to-store
 
       - name: Generate Flutter app
         id: generate
         run: |
-          npm run generate -- --config config.json --output generated-app
+          npm run generate:fashion
           echo "::set-output name=app_path::generated-app"
 
       - name: Setup Flutter

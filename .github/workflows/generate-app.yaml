@@ -152,7 +152,7 @@ jobs:
         continue-on-error: true
         run: |
           cd generated-app
-          flutter build apk --release --split-debug-info=build/symbols --verbose
+          flutter build apk --target-platform android-arm64 --analyze-size
       - name: Check APK size
         run: |
           cd generated-app/build/app/outputs/flutter-apk

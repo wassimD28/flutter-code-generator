@@ -46,15 +46,16 @@ jobs:
           echo '${{ github.event.inputs.config }}' > quick-config.json
           npm run convert:to-store
 
+      - name: Scan Template files
+        id: scan
+        run: |
+          npm run scan:fashion
       - name: Generate Flutter app
         id: generate
         run: |
           npm run generate:fashion
           echo "Listing generated directory contents:"
           ls -la generated-app
-          echo "Checking for pubspec.yaml:"
-          cat generated-app/pubspec.yaml
-          echo "app_path=generated-app" >> $GITHUB_OUTPUT
 
       # Clear Flutter SDK caches and install the required version
       - name: Clean any existing Flutter installations

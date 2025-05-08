@@ -121,30 +121,9 @@ jobs:
         run: |
           cd generated-app
           flutter clean
-    
-      - name: Installing app dependencies
-        id: dependencies
-        run: |
-          cd generated-app
-          flutter pub get
-          
-      - name: Generate app icon
-        id: icon
-        if: steps.dependencies.outcome == 'success'
-        run: |
-          cd generated-app
-          flutter pub run flutter_launcher_icons:main
-          
-      - name: Generate app splash
-        id: splash
-        if: steps.icon.outcome == 'success'
-        run: |
-          cd generated-app
-          flutter pub run flutter_native_splash:create
 
       - name: Build APK
         id: build_apk
-        if: steps.splash.outcome == 'success'
         run: |
           cd generated-app
           flutter build apk --target-platform android-arm64 --analyze-size
@@ -226,10 +205,7 @@ jobs:
               echo "Warning: ImageKit upload was successful but no download URL was provided"
             fi
           else
-            # Determine failure point for better error message
-            if [[ "${{ steps.dependencies.outcome }}" != "success" ]]; then
-              MESSAGE="Failed to install Flutter dependencies - Dart SDK version mismatch"
-            elif [[ "${{ steps.build_apk.outcome }}" != "success" ]]; then
+            if [[ "${{ steps.build_apk.outcome }}" != "success" ]]; then
               MESSAGE="Failed to build APK"
             else
               MESSAGE="Failed to upload APK to storage"

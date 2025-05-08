@@ -84,15 +84,16 @@ jobs:
           npm run scan:fashion
       - name: Check for Project structure file
         run: |
-          if [ ! -f /project-structure/fashion.json ]; then
+          if [ ! -f "project-structure/fashion.json" ]; then
             echo "Error: fashion.json file not found!"
             exit 1
           fi
-          echo "fashion file scanned successfully."
+          echo "Fashion file scanned successfully."
+              
       - name: Print fashion.json contents
         run: |
           echo "========== FASHION.JSON CONTENTS =========="
-          cat /project-structure/fashion.json
+          cat project-structure/fashion.json
           echo "========== END FASHION.JSON CONTENTS =========="
 
       # Rest of the workflow remains unchanged

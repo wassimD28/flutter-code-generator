@@ -119,6 +119,7 @@ jobs:
           
       - name: Flutter clean
         run: |
+          cd generated-app
           flutter clean
     
       - name: Installing app dependencies

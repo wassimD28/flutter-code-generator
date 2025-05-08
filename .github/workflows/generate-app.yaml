@@ -43,13 +43,47 @@ jobs:
 
       - name: Create config file
         run: |
-          echo '${{ github.event.inputs.config }}' > quick-config.json
+          echo '${{ github.event.inputs.config }}' > config.json
+          
+      
+      - name: Validate config file
+        run: |
+          if [ ! -f config.json ]; then
+            echo "Error: config.json file not found!"
+            exit 1
+          fi
+          echo "Config file created successfully."
+          
+      - name: Print config.json contents
+        run: |
+          echo "========== CONFIG.JSON CONTENTS =========="
+          cat config.json
+          echo "========== END CONFIG.JSON CONTENTS =========="
+          
+      - name: Convert Config to QuickConfig
+        run: |
           npm run convert:to-store
-
+        
+      - name: Validate QuickConfig file
+        run: |
+          if [ ! -f quick-config.json ]; then
+            echo "Error: quick-config.json file not found!"
+            exit 1
+          fi
+          echo "QuickConfig file created successfully."
+          
+      - name: Print quick-config.json contents
+        run: |
+          echo "========== QUICK-CONFIG.JSON CONTENTS =========="
+          cat quick-config.json
+          echo "========== END QUICK-CONFIG.JSON CONTENTS =========="
+          
       - name: Scan Template files
         id: scan
         run: |
           npm run scan:fashion
+
+      # Rest of the workflow remains unchanged
       - name: Generate Flutter app
         id: generate
         run: |
@@ -75,36 +109,11 @@ jobs:
           dart --version
           
           
-      - name: Installing app dependencies with detailed logging
+      - name: Installing app dependencies
         id: dependencies
         run: |
           cd generated-app
-          echo "Running flutter pub get with detailed output..."
-          flutter pub get --verbose > pub_get_log.txt 2>&1
-          EXIT_CODE=$?
-          
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Flutter pub get failed with exit code $EXIT_CODE"
-            echo "Error log:"
-            cat pub_get_log.txt
-            
-            # Try to fix common issues automatically with improved method
-            echo "Attempting automatic fixes..."
-            
-            # More robust replacement for SDK constraints
-            sed -i -E 's/(sdk:[ ]*)[^\s]+/\1">=2.12.0 <4.0.0"/' pubspec.yaml
-            
-            # Remove all version constraints from dependencies with a more robust approach
-            sed -i '/dependencies:/,/dev_dependencies:/ s/: \^[0-9.]+/: any/g' pubspec.yaml
-            
-            echo "Modified pubspec.yaml after auto-fix:"
-            cat pubspec.yaml
-            
-            echo "Retrying flutter pub get..."
-            flutter pub get
-          else
-            echo "Flutter pub get completed successfully"
-          fi
+          flutter pub get
           
       - name: Generate app icon
         id: icon

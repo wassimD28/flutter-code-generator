@@ -82,6 +82,18 @@ jobs:
         id: scan
         run: |
           npm run scan:fashion
+      - name: Check for Project structure file
+        run: |
+          if [ ! -f /project-structure/fashion.json ]; then
+            echo "Error: fashion.json file not found!"
+            exit 1
+          fi
+          echo "fashion file scanned successfully."
+      - name: Print fashion.json contents
+        run: |
+          echo "========== FASHION.JSON CONTENTS =========="
+          cat /project-structure/fashion.json
+          echo "========== END FASHION.JSON CONTENTS =========="
 
       # Rest of the workflow remains unchanged
       - name: Generate Flutter app
@@ -91,24 +103,23 @@ jobs:
           echo "Listing generated directory contents:"
           ls -la generated-app
 
-      # Clear Flutter SDK caches and install the required version
-      - name: Clean any existing Flutter installations
-        run: |
-          rm -rf $HOME/.flutter $HOME/.pub-cache
           
-      # Use a Flutter version with Dart SDK 3.7.0 or newer
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: false  # Disable caching to ensure clean installation
-
+          # Use a Flutter version with Dart SDK 3.7.0 or newer
+          - name: Setup Flutter
+          uses: subosito/flutter-action@v2
+          with:
+            channel: 'stable'
+            cache: false  # Disable caching to ensure clean installation
+            
       - name: Verify Flutter and Dart versions
         run: |
           flutter --version
           dart --version
           
-          
+      - name: Flutter clean
+        run: |
+          flutter clean
+    
       - name: Installing app dependencies
         id: dependencies
         run: |
@@ -161,7 +172,7 @@ jobs:
             const file = await fs.readFile(apkPath);
             const result = await imagekit.upload({
               file: file,
-              fileName: 'app-${{ github.event.inputs.storeId }}-${{ github.event.inputs.jobId }}.apk',
+              fileName: 'app-${{ github.event.inputs.jobId }}.apk',
               folder: '/store-apps'
             });
             console.log(result.url);

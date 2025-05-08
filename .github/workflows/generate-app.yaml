@@ -43,8 +43,26 @@ jobs:
 
       - name: Create config file
         run: |
-          echo '${{ github.event.inputs.config }}' > config.json
+          echo '${{ github.event.inputs.config }}' > quick-config.json
           
+      - name: Validate QuickConfig file
+        run: |
+          if [ ! -f quick-config.json ]; then
+            echo "Error: quick-config.json file not found!"
+            exit 1
+          fi
+          echo "QuickConfig file created successfully."
+          
+      - name: Print quick-config.json contents
+        run: |
+          echo "========== QUICK-CONFIG.JSON CONTENTS =========="
+          cat quick-config.json
+          echo "========== END QUICK-CONFIG.JSON CONTENTS =========="
+      
+      - name: Convert Config to QuickConfig
+        run: |
+          npm run convert:to-store
+        
       
       - name: Validate config file
         run: |
@@ -59,24 +77,6 @@ jobs:
           echo "========== CONFIG.JSON CONTENTS =========="
           cat config.json
           echo "========== END CONFIG.JSON CONTENTS =========="
-          
-      - name: Convert Config to QuickConfig
-        run: |
-          npm run convert:to-store
-        
-      - name: Validate QuickConfig file
-        run: |
-          if [ ! -f quick-config.json ]; then
-            echo "Error: quick-config.json file not found!"
-            exit 1
-          fi
-          echo "QuickConfig file created successfully."
-          
-      - name: Print quick-config.json contents
-        run: |
-          echo "========== QUICK-CONFIG.JSON CONTENTS =========="
-          cat quick-config.json
-          echo "========== END QUICK-CONFIG.JSON CONTENTS =========="
           
       - name: Scan Template files
         id: scan

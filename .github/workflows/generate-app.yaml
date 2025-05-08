@@ -89,7 +89,7 @@ jobs:
             exit 1
           fi
           echo "Fashion file scanned successfully."
-              
+
       - name: Print fashion.json contents
         run: |
           echo "========== FASHION.JSON CONTENTS =========="
@@ -105,12 +105,12 @@ jobs:
           ls -la generated-app
 
           
-          # Use a Flutter version with Dart SDK 3.7.0 or newer
-          - name: Setup Flutter
-          uses: subosito/flutter-action@v2
-          with:
-            channel: 'stable'
-            cache: false  # Disable caching to ensure clean installation
+      # Use a Flutter version with Dart SDK 3.7.0 or newer
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: false  # Disable caching to ensure clean installation
             
       - name: Verify Flutter and Dart versions
         run: |

@@ -3,6 +3,10 @@
     "core": [
       {
         "name": ".env",
+        "path": ".env.example"
+      },
+      {
+        "name": ".env",
         "path": ".env"
       },
       {

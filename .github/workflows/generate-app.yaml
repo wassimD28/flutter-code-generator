@@ -32,6 +32,80 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Setup Pusher notification helper script
+      - name: Setup Pusher notification helper
+        run: |
+          cat > send-pusher-notification.js << 'EOF'
+          const Pusher = require('pusher');
+          
+          // Create Pusher client with env variables
+          const pusher = new Pusher({
+            appId: process.env.PUSHER_APP_ID,
+            key: process.env.PUSHER_KEY,
+            secret: process.env.PUSHER_SECRET,
+            cluster: process.env.PUSHER_CLUSTER,
+            useTLS: true
+          });
+          
+          // Get command line arguments
+          const jobId = process.argv[2];
+          const storeId = process.argv[3];
+          const status = process.argv[4];
+          const message = process.argv[5];
+          const progress = parseInt(process.argv[6]) || 0;
+          const downloadUrl = process.argv[7] || '';
+          
+          // Validate required params
+          if (!jobId || !storeId || !status || !message) {
+            console.error('Missing required parameters');
+            console.error('Usage: node send-pusher-notification.js <jobId> <storeId> <status> <message> [progress] [downloadUrl]');
+            process.exit(1);
+          }
+          
+          async function sendNotification() {
+            try {
+              const eventData = {
+                jobId,
+                storeId,
+                status,
+                message,
+                progress,
+                downloadUrl,
+                timestamp: new Date().toISOString()
+              };
+              
+              console.log(`Sending Pusher notification to channel store-${storeId}:`, eventData);
+              
+              // Send notification via Pusher
+              await pusher.trigger(
+                `store-${storeId}`,
+                'app-generation-update',
+                eventData
+              );
+              
+              console.log('Pusher notification sent successfully');
+            } catch (error) {
+              console.error('Failed to send Pusher notification:', error);
+              // Don't fail the build if notification fails
+            }
+          }
+          
+          sendNotification();
+          EOF
+          
+          # Install pusher
+          npm install pusher
+
+      # Send initial notification
+      - name: Send initial notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Starting Flutter app generation" 5
+
       - name: Validate callback URL
         run: |
           CALLBACK_URL="${{ github.event.inputs.callbackUrl }}"
@@ -40,6 +114,17 @@ jobs:
             exit 1
           fi
           echo "Callback URL validated: $CALLBACK_URL"
+          
+      # Send notification after callback URL validation
+      - name: Send validation completed notification
+        if: success()
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Configuration validation successful" 10
 
       - name: Create config file
         run: |
@@ -63,6 +148,16 @@ jobs:
         run: |
           npm run convert:to-store
         
+      # Send notification after config processing
+      - name: Send config processing notification
+        if: success()
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Store configuration processed" 20
       
       - name: Validate config file
         run: |
@@ -82,6 +177,18 @@ jobs:
         id: scan
         run: |
           npm run scan:fashion
+          
+      # Send notification after template scanning
+      - name: Send template scanning notification
+        if: success()
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Template files scanned" 30
+          
       - name: Check for Project structure file
         run: |
           if [ ! -f "project-structure/fashion.json" ]; then
@@ -96,14 +203,33 @@ jobs:
           cat project-structure/fashion.json
           echo "========== END FASHION.JSON CONTENTS =========="
 
-      # Rest of the workflow remains unchanged
+      # Send notification before code generation
+      - name: Send pre-generation notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Starting code generation" 40
+
       - name: Generate Flutter app
         id: generate
         run: |
           npm run generate:fashion
           echo "Listing generated directory contents:"
           ls -la generated-app
-
+          
+      # Send notification after code generation
+      - name: Send post-generation notification
+        if: steps.generate.outcome == 'success'
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Flutter code generation complete" 60
           
       # Use a Flutter version with Dart SDK 3.7.0 or newer
       - name: Setup Flutter
@@ -117,20 +243,53 @@ jobs:
           flutter --version
           dart --version
           
+      # Send notification after Flutter setup
+      - name: Send Flutter setup notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Flutter setup complete, preparing build" 70
+          
       - name: Flutter clean
         run: |
           cd generated-app
           flutter clean
+
+      # Send notification before APK build
+      - name: Send pre-build notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Building APK" 80
 
       - name: Build APK
         id: build_apk
         run: |
           cd generated-app
           flutter build apk --target-platform android-arm64 --analyze-size
+          
       - name: Check APK size
         run: |
           cd generated-app/build/app/outputs/flutter-apk
           ls -lh app-release.apk
+          
+      # Send notification after APK build
+      - name: Send post-build notification
+        if: steps.build_apk.outcome == 'success'
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "APK built successfully, uploading" 90
+          
       - name: Upload APK to ImageKit
         id: imagekit_upload
         if: steps.build_apk.outcome == 'success'
@@ -171,6 +330,18 @@ jobs:
             echo "Failed to upload APK"
             exit 1
           fi
+          
+      # Send notification after APK upload
+      - name: Send upload success notification
+        if: steps.imagekit_upload.outcome == 'success'
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "APK uploaded successfully" 95 "${{ steps.imagekit_upload.outputs.download_url }}"
+          
       - name: Upload APK as GitHub artifact (backup)
         if: steps.build_apk.outcome == 'success'
         uses: actions/upload-artifact@v4
@@ -271,3 +442,32 @@ jobs:
           if [ "$SUCCESS" != "true" ]; then
             echo "All callback attempts failed."
           fi
+      
+      # Send final notification with result
+      - name: Send final notification
+        if: always()
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          STATUS="FAILED"
+          PROGRESS=0
+          MESSAGE="Flutter app generation failed"
+          DOWNLOAD_URL=""
+          
+          # Check the outcomes to determine final status
+          if [[ "${{ steps.imagekit_upload.outcome }}" == "success" && -n "${{ steps.imagekit_upload.outputs.download_url }}" ]]; then
+            STATUS="COMPLETED"
+            PROGRESS=100
+            MESSAGE="Flutter app generation completed successfully"
+            DOWNLOAD_URL="${{ steps.imagekit_upload.outputs.download_url }}"
+          elif [[ "${{ steps.build_apk.outcome }}" != "success" ]]; then
+            MESSAGE="Failed to build APK"
+          else
+            MESSAGE="Failed to upload APK to storage"
+          fi
+          
+          # Send final notification via Pusher
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "$STATUS" "$MESSAGE" $PROGRESS "$DOWNLOAD_URL"

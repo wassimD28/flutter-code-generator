@@ -257,6 +257,51 @@ jobs:
         run: |
           cd generated-app
           flutter clean
+      # Send notification before icon generation
+      - name: Send app icon preparation notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Setting up app icon" 70
+      - name: Generate app icons
+        run: |
+          cd generated-app
+          flutter pub run flutter_launcher_icons
+      # Send notification after icon generation
+      - name: Send app icon completion notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "App icon generated" 75
+
+       # Send notification before splash screen generation
+      - name: Send splash screen preparation notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Setting up splash screen" 76
+      - name: Generate splash screen
+        run: |
+          cd generated-app
+          flutter pub run flutter_native_splash:create
+      # Send notification after splash screen generation
+      - name: Send splash screen completion notification
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
+        run: |
+          node send-pusher-notification.js "${{ github.event.inputs.jobId }}" "${{ github.event.inputs.storeId }}" "IN_PROGRESS" "Splash screen generated" 78
 
       # Send notification before APK build
       - name: Send pre-build notification

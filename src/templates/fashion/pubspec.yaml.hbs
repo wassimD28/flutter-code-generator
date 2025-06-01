@@ -23,10 +23,10 @@ environment:
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# consider running lutter pub upgrade --major-versions. Alternatively,
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
+# versions available, run lutter pub outdated.
 dependencies:
   flutter:
     sdk: flutter
@@ -41,22 +41,31 @@ dependencies:
   google_nav_bar: ^5.0.7
   synchronized: ^3.3.1
   easy_localization: ^3.0.7+1
+  flutter_native_splash: ^2.4.4
   http_parser: ^4.1.2
   flutter_cache_manager: ^3.4.1
   shimmer: ^3.0.0
   pusher_client_fixed:
     git:
       url: https://github.com/AbdoPrDZ/pusher_client_fixed.git
+  connectivity_plus: ^5.0.1
+  flutter_stripe: ^11.5.0
+  logger: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
+  mockito: ^5.4.4
+  build_runner: ^2.4.12
+  dart_dev: ^4.2.3
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.3
-  flutter_native_splash: ^2.4.4
   uuid: ^4.5.1
   jwt_decoder: ^2.0.1
   logger: ^1.1.0
+  timeago: ^3.6.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -107,6 +116,17 @@ flutter:
         - asset: assets/fonts/Gabarito/Gabarito-Medium.ttf
           weight: 500
         - asset: assets/fonts/Gabarito/Gabarito-Bold.ttf
+          weight: 700
+
+    - family: NotoKufiArabic
+      fonts:
+        - asset: assets/fonts/NotoKufiArabic/NotoKufiArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoKufiArabic/NotoKufiArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoKufiArabic/NotoKufiArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoKufiArabic/NotoKufiArabic-Bold.ttf
           weight: 700
 
   # For details regarding fonts from package dependencies,

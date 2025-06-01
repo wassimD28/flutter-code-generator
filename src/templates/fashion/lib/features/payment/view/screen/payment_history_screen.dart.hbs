@@ -1,0 +1,382 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/assets_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/shared/extensions/text_extensions.dart';
+import 'package:{{ snakeCase appName }}/app/shared/widgets/theme_aware_svg.dart';
+import '../../controller/payment_controller.dart';
+import '../../models/payment_history_model.dart';
+
+class PaymentHistoryScreen extends StatefulWidget {
+  const PaymentHistoryScreen({super.key});
+
+  @override
+  State<PaymentHistoryScreen> createState() => _PaymentHistoryScreenState();
+}
+
+class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
+  final PaymentController _paymentController = Get.find<PaymentController>();
+  final ScrollController _scrollController = ScrollController();
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _paymentController.fetchPaymentHistory();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      _loadMoreHistory();
+    }
+  }
+
+  Future<void> _loadMoreHistory() async {
+    if (_isLoadingMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    _currentPage++;
+    await _paymentController.fetchPaymentHistory(page: _currentPage);
+
+    setState(() {
+      _isLoadingMore = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isRtl = LocalizationService.isRtl(context);
+
+    return Scaffold(
+      backgroundColor: AppColors.background(context),
+      appBar: AppBar(
+        backgroundColor: AppColors.background(context),
+        elevation: 0,
+        leading: Container(
+          margin: EdgeInsets.only(left: isRtl ? 0 : 16, right: isRtl ? 16 : 0),
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: AppColors.secondary(context),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: ThemeAwareSvg(
+              assetPath: isRtl ? AssetConfig.arrowRight : AssetConfig.arrowLeft,
+              height: 24,
+              width: 24,
+            ),
+            onPressed: () => Get.back(),
+          ),
+        ),
+        centerTitle: true,
+        title: Text('payment.payment_history'.translate()).heading5(context),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => _paymentController.fetchPaymentHistory(),
+        color: AppColors.primary(context),
+        child: Obx(() {
+          if (_paymentController.isLoadingHistory.value &&
+              _paymentController.paymentHistory.isEmpty) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary(context),
+              ),
+            );
+          }
+
+          if (_paymentController.hasError.value) {
+            return _buildErrorView();
+          }
+
+          if (_paymentController.paymentHistory.isEmpty) {
+            return _buildEmptyState();
+          }
+
+          return _buildHistoryList();
+        }),
+      ),
+    );
+  }
+
+  Widget _buildErrorView() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(UIConfig.paddingLarge),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: AppColors.destructive(context),
+            ),
+            SizedBox(height: UIConfig.marginMedium),
+            Text(
+              'payment.error_loading_history'.translate(),
+              textAlign: TextAlign.center,
+            ).heading5(context),
+            SizedBox(height: UIConfig.marginSmall),
+            Text(
+              _paymentController.errorMessage.value,
+              textAlign: TextAlign.center,
+            ).body(context),
+            SizedBox(height: UIConfig.marginLarge),
+            ElevatedButton(
+              onPressed: () {
+                _currentPage = 1;
+                _paymentController.fetchPaymentHistory();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary(context),
+                foregroundColor: AppColors.primaryForeground(context),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.globalButtonsRadius),
+                ),
+              ),
+              child: Text('common.retry'.translate()).button(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(UIConfig.paddingLarge),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 64,
+              color: AppColors.muted(context),
+            ),
+            SizedBox(height: UIConfig.marginMedium),
+            Text(
+              'payment.no_payment_history'.translate(),
+              textAlign: TextAlign.center,
+            ).heading5(context),
+            SizedBox(height: UIConfig.marginSmall),
+            Text(
+              'payment.no_payment_history_desc'.translate(),
+              textAlign: TextAlign.center,
+            ).body(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryList() {
+    return ListView.separated(
+      controller: _scrollController,
+      padding: EdgeInsets.all(UIConfig.paddingMedium),
+      itemCount:
+          _paymentController.paymentHistory.length + (_isLoadingMore ? 1 : 0),
+      separatorBuilder:
+          (context, index) => SizedBox(height: UIConfig.marginSmall),
+      itemBuilder: (context, index) {
+        if (index == _paymentController.paymentHistory.length) {
+          return _buildLoadingItem();
+        }
+
+        final payment = _paymentController.paymentHistory[index];
+        return _buildPaymentHistoryCard(payment);
+      },
+    );
+  }
+
+  Widget _buildLoadingItem() {
+    return Container(
+      padding: EdgeInsets.all(UIConfig.paddingMedium),
+      child: Center(
+        child: CircularProgressIndicator(
+          color: AppColors.primary(context),
+          strokeWidth: 2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentHistoryCard(PaymentHistory payment) {
+    return Container(
+      padding: EdgeInsets.all(UIConfig.paddingMedium),
+      decoration: BoxDecoration(
+        color: AppColors.card(context),
+        borderRadius: BorderRadius.circular(AppTheme.globalRadius),
+        border: Border.all(color: AppColors.border(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row with order ID and status
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'payment.order_id'.translate().replaceFirst('{id}', payment.orderId),
+                  overflow: TextOverflow.ellipsis,
+                ).body(context),
+              ),
+              _buildStatusChip(payment),
+            ],
+          ),
+
+          SizedBox(height: UIConfig.marginSmall),
+
+          // Amount and payment method
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(payment.formattedAmount).heading5(context),
+              Text(_getPaymentMethodDisplay(payment.paymentMethod)).caption(context),
+            ],
+          ),
+
+          SizedBox(height: UIConfig.marginSmall),
+
+          // Date and description
+          Text(_formatDate(payment.createdAt)).caption(context),
+
+          if (payment.description != null) ...[
+            SizedBox(height: 4),
+            Text(
+              payment.description!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ).caption(context),
+          ],
+
+          // Receipt link if available
+          if (payment.receiptUrl != null) ...[
+            SizedBox(height: UIConfig.marginSmall),
+            GestureDetector(
+              onTap: () => _openReceipt(payment.receiptUrl!),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.receipt_outlined,
+                    size: 16,
+                    color: AppColors.primary(context),
+                  ),
+                  SizedBox(width: 4),                  Text(
+                    'payment.view_receipt'.translate(),
+                    style: TextStyle(
+                      color: AppColors.primary(context),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(PaymentHistory payment) {
+    Color backgroundColor;
+    Color textColor;
+    String statusText;
+
+    if (payment.isSuccessful) {
+      backgroundColor = Colors.green.withOpacity(0.1);
+      textColor = Colors.green;
+      statusText = 'payment.status.success'.translate();
+    } else if (payment.isPending) {
+      backgroundColor = Colors.orange.withOpacity(0.1);
+      textColor = Colors.orange;
+      statusText = 'payment.status.pending'.translate();
+    } else {
+      backgroundColor = Colors.red.withOpacity(0.1);
+      textColor = Colors.red;
+      statusText = 'payment.status.failed'.translate();
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: UIConfig.paddingSmall,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(AppTheme.globalRadius),
+      ),      child: Text(
+        statusText,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  String _getPaymentMethodDisplay(String paymentMethod) {
+    switch (paymentMethod.toLowerCase()) {
+      case 'credit_card':
+      case 'card':
+        return 'payment.method.credit_card'.translate();
+      case 'debit_card':
+        return 'payment.method.debit_card'.translate();
+      case 'paypal':
+        return 'payment.method.paypal'.translate();
+      case 'apple_pay':
+        return 'payment.method.apple_pay'.translate();
+      case 'google_pay':
+        return 'payment.method.google_pay'.translate();
+      default:
+        return paymentMethod.replaceAll('_', ' ').toUpperCase();
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      return 'common.today'.translate() + ' ${_formatTime(date)}';
+    } else if (difference.inDays == 1) {
+      return 'common.yesterday'.translate() + ' ${_formatTime(date)}';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} ${'common.days_ago'.translate()}';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
+  String _formatTime(DateTime date) {
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  void _openReceipt(String receiptUrl) {
+    // Navigate to receipt view or open in browser
+    // For now, just show a snackbar - implementation would go here
+    // TODO: Implement receipt opening functionality
+  }
+}
+

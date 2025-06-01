@@ -12,11 +12,10 @@ import 'package:{{ snakeCase appName }}/app/core/config/routes_config.dart';
 import 'package:{{ snakeCase appName }}/features/auth/views/screen/email_confirmation_screen.dart';
 import 'package:{{ snakeCase appName }}/features/auth/views/screen/forget_password_screen.dart';
 import 'package:{{ snakeCase appName }}/features/auth/views/screen/login_screen.dart';
-import 'package:{{ snakeCase appName }}/features/auth/views/screen/reset_password_screen.dart';
 import 'package:{{ snakeCase appName }}/features/auth/views/screen/signup_screen.dart';
-import 'package:{{ snakeCase appName }}/features/payment/view/widget/add_card_screen.dart';
+import 'package:{{ snakeCase appName }}/features/auth/views/screen/otp_verification_screen.dart';
+import 'package:{{ snakeCase appName }}/features/auth/views/screen/new_reset_password_screen.dart';
 import 'package:{{ snakeCase appName }}/features/cart/views/screen/cart_screen.dart';
-import 'package:{{ snakeCase appName }}/features/cart/views/screen/checkout_screen.dart';
 import 'package:{{ snakeCase appName }}/features/category/views/category_screen.dart';
 import 'package:{{ snakeCase appName }}/features/home/views/screen/home_screen.dart';
 import 'package:{{ snakeCase appName }}/features/language/language_binding.dart';
@@ -36,17 +35,31 @@ import 'package:{{ snakeCase appName }}/features/address/view/add_address.dart';
 import 'package:{{ snakeCase appName }}/features/address/view/address_screen.dart';
 import 'package:{{ snakeCase appName }}/features/profile/views/screens/edit_profile_screen.dart';
 import 'package:{{ snakeCase appName }}/features/notifications/views/notification_screen.dart';
-import 'package:{{ snakeCase appName }}/features/order/view/widget/orders_details_screen.dart';
+import 'package:{{ snakeCase appName }}/features/order/view/screen/orders_details_screen.dart';
 import 'package:{{ snakeCase appName }}/features/order/view/screen/orders_screen.dart';
+import 'package:{{ snakeCase appName }}/features/order/view/screen/order_confirmation_screen.dart';
+import 'package:{{ snakeCase appName }}/app/screens/order_failure_screen.dart';
+import 'package:{{ snakeCase appName }}/features/payment/view/screen/add_card_page.dart';
 import 'package:{{ snakeCase appName }}/features/payment/view/screen/payment_screen.dart';
+import 'package:{{ snakeCase appName }}/features/payment/view/screen/payment_history_screen.dart';
+import 'package:{{ snakeCase appName }}/features/payment/view/screen/payment_success_screen.dart';
+import 'package:{{ snakeCase appName }}/features/payment/view/screen/payment_failure_screen.dart';
+import 'package:{{ snakeCase appName }}/features/payment/binding/payment_binding.dart';
 import 'package:{{ snakeCase appName }}/features/profile/views/screens/profile_screen.dart';
 import 'package:{{ snakeCase appName }}/app/shared/layouts/main_container_screen.dart';
 import 'package:{{ snakeCase appName }}/app/shared/screens/splash_screen.dart';
+import 'package:{{ snakeCase appName }}/features/promotion/models/promotion_model.dart';
+import 'package:{{ snakeCase appName }}/features/promotion/views/widgets/promotion_product_page.dart';
 import 'package:{{ snakeCase appName }}/features/review/binding/review_binding.dart';
 import 'package:{{ snakeCase appName }}/features/settings/views/setting_screen.dart';
 import 'package:{{ snakeCase appName }}/features/subcategory/controllers/subcategory_controller.dart';
+import 'package:{{ snakeCase appName }}/features/settings/views/settings_language_screen.dart';
+import 'package:{{ snakeCase appName }}/features/settings/bindings/settings_language_binding.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/views/wishlist_screen.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/binding/wishlist_binding.dart';
+import 'package:{{ snakeCase appName }}/features/checkout/binding/checkout_binding.dart';
+import 'package:{{ snakeCase appName }}/features/checkout/views/screens/checkout_screen.dart';
+import 'package:{{ snakeCase appName }}/features/payment/view/screen/payment_processing_screen.dart';
 
 List<GetPage<dynamic>>? routes = [
   GetPage(name: '/', page: () => const SplashScreen()),
@@ -58,11 +71,16 @@ List<GetPage<dynamic>>? routes = [
     binding: HomeBinding(),
     middlewares: [AuthMiddleware()],
   ),
-
   GetPage(
     name: AppRoute.language,
     page: () => const LanguageScreen(),
     binding: LanguageBinding(),
+  ),
+
+  GetPage(
+    name: AppRoute.settingsLanguage,
+    page: () => const SettingsLanguageScreen(),
+    binding: SettingsLanguageBinding(),
   ),
 
   GetPage(
@@ -88,17 +106,22 @@ List<GetPage<dynamic>>? routes = [
   ),
   GetPage(
     name: AppRoute.forgetPassword,
-    page: () => ForgetPassword(),
+    page: () => ForgetPasswordScreen(),
+    binding: AuthBinding(),
+  ),
+  GetPage(
+    name: AppRoute.verifyOtp,
+    page: () => OtpVerificationScreen(),
+    binding: AuthBinding(),
+  ),
+  GetPage(
+    name: AppRoute.resetPasswordNew,
+    page: () => NewResetPasswordScreen(),
     binding: AuthBinding(),
   ),
   GetPage(
     name: AppRoute.emailResetPasswordConfirmation,
     page: () => const EmailSentConfirmationResetPassword(),
-    binding: AuthBinding(),
-  ),
-  GetPage(
-    name: AppRoute.resetPassword,
-    page: () => ResetPasswordPage(),
     binding: AuthBinding(),
   ),
 
@@ -138,7 +161,9 @@ List<GetPage<dynamic>>? routes = [
     name: AppRoute.reviews,
     page: () {
       final productId = Get.parameters['productId'] ?? '';
-      return ProductDetailScreen(productId: productId); // Adjust if you have a ReviewScreen
+      return ProductDetailScreen(
+        productId: productId,
+      ); // Adjust if you have a ReviewScreen
     },
     bindings: [ProductBinding(), ReviewBinding()],
   ),
@@ -166,8 +191,23 @@ List<GetPage<dynamic>>? routes = [
   ),
   GetPage(
     name: AppRoute.checkout,
-    page: () => CheckoutScreen(),
-    binding: HomeBinding(),
+    page: () => const CheckoutScreen(),
+    binding: CheckoutBinding(),
+  ),
+  GetPage(
+    name: AppRoute.paymentProcessing,
+    page: () => const PaymentProcessingScreen(),
+    binding: CheckoutBinding(),
+  ),
+  GetPage(
+    name: AppRoute.orderConfirmation,
+    page: () => const OrderConfirmationScreen(),
+    binding: OrderBinding(),
+  ),
+  GetPage(
+    name: AppRoute.orderFailure,
+    page: () => const OrderFailureScreen(),
+    binding: OrderBinding(),
   ),
   GetPage(
     name: AppRoute.address,
@@ -186,13 +226,28 @@ List<GetPage<dynamic>>? routes = [
   ),
   GetPage(
     name: AppRoute.payments,
-    page: () => PaymentMethodPage(),
-    binding: HomeBinding(),
+    page: () => const PaymentMethodPage(),
+    binding: PaymentBinding(),
   ),
   GetPage(
     name: AppRoute.addPayment,
     page: () => const AddCardPage(),
-    binding: HomeBinding(),
+    binding: PaymentBinding(),
+  ),
+  GetPage(
+    name: AppRoute.paymentHistory,
+    page: () => const PaymentHistoryScreen(),
+    binding: PaymentBinding(),
+  ),
+  GetPage(
+    name: AppRoute.paymentSuccess,
+    page: () => const PaymentSuccessScreen(),
+    binding: PaymentBinding(),
+  ),
+  GetPage(
+    name: AppRoute.paymentFailure,
+    page: () => const PaymentFailureScreen(),
+    binding: PaymentBinding(),
   ),
   GetPage(
     name: AppRoute.orders,
@@ -201,7 +256,7 @@ List<GetPage<dynamic>>? routes = [
   ),
   GetPage(
     name: AppRoute.orderDetails,
-    page: () => OrderDetailsPage(),
+    page: () => const OrderDetailsPage(),
     binding: OrderBinding(),
   ),
   GetPage(
@@ -209,22 +264,32 @@ List<GetPage<dynamic>>? routes = [
     page: () => NotificationsPage(),
     binding: HomeBinding(),
   ),
-GetPage(
-  name: AppRoute.categoryDetail,
-  page: () => CategoryProductsScreen(),
-  transition: Transition.cupertino,
-  binding: CategoryProductsBinding() as Bindings,
-),
-GetPage(
-  name: AppRoute.filter,
-  page: () => FilterBottomSheet(
-    listController: Get.find<ProductListController>(),
-    filterController: Get.find<ProductFilterController>(),
-    categoryController: Get.find<CategoryController>(),
-    subcategoryController: Get.find<SubcategoryController>(),
+  GetPage(
+    name: AppRoute.categoryDetail,
+    page: () => CategoryProductsScreen(),
+    transition: Transition.cupertino,
+    binding: CategoryProductsBinding() as Bindings,
   ),
-  transition: Transition.cupertino,
-  binding: CategoryProductsBinding() as Bindings,
-),
-
+  GetPage(
+    name: AppRoute.filter,
+    page:
+        () => FilterBottomSheet(
+          listController: Get.find<ProductListController>(),
+          filterController: Get.find<ProductFilterController>(),
+          categoryController: Get.find<CategoryController>(),
+          subcategoryController: Get.find<SubcategoryController>(),
+        ),
+    transition: Transition.cupertino,
+    binding: CategoryProductsBinding() as Bindings,
+  ),
+  GetPage(
+      name: AppRoute.promotionProducts,
+      page: () {
+        final Promotion promotion = Get.arguments as Promotion;
+        return PromotionProductsPage(promotion: promotion);
+      },
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
 ];
+

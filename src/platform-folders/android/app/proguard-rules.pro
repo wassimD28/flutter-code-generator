@@ -15,6 +15,10 @@
 # Don't warn about Pusher client
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 
+# Stripe SDK - ignore missing classes warnings
+-dontwarn com.stripe.android.pushProvisioning.**
+-dontwarn com.reactnativestripesdk.**
+
 # GetX related
 -keep class get.** { *; }
 
@@ -32,3 +36,9 @@
 -keepclasseswithmembernames class * {
     native <methods>;
 }
+
+# General warnings to ignore for common missing classes
+-dontwarn javax.annotation.**
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.**
+-dontwarn okio.**

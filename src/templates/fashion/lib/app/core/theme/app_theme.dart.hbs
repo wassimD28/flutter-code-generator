@@ -4,17 +4,21 @@ import 'package:{{ snakeCase appName }}/app/core/theme/app_color_extension.dart'
 import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/app_typography.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/app_typography_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class AppTheme {
-  // Light theme colors based on config
+  AppTheme._();
+  static const double globalRadius = {{ design.radius }}.0;
+  static const double globalInputsRadius = {{ design.radius }}.0;
+  static const double globalButtonsRadius = {{ design.radius }}.0;  // Light theme colors
   static const lightColors = AppColorsData(
     background: Color(0xFF{{stripHexHash design.lightTheme.backgroundColor}}),
     foreground: Color(0xFF{{stripHexHash design.lightTheme.foregroundColor}}),
     primary: Color(0xFF{{stripHexHash design.lightTheme.primaryColor}}),
     primaryForeground: Color(0xFF{{stripHexHash design.lightTheme.primaryForegroundColor}}),
-    secondary: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}), // Use card color as secondary
+    secondary: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}),
     secondaryForeground: Color(0xFF{{stripHexHash design.lightTheme.cardForegroundColor}}),
-    accent: Color(0xFF{{stripHexHash design.lightTheme.primaryColor}}), // Use primary color as accent
+    accent: Color(0xFF{{stripHexHash design.lightTheme.primaryColor}}),
     accentForeground: Color(0xFF{{stripHexHash design.lightTheme.primaryForegroundColor}}),
     muted: Color(0xFF{{stripHexHash design.lightTheme.mutedColor}}),
     mutedForeground: Color(0xFF{{stripHexHash design.lightTheme.mutedForegroundColor}}),
@@ -23,20 +27,22 @@ class AppTheme {
     border: Color(0xFF{{stripHexHash design.lightTheme.borderColor}}),
     input: Color(0xFF{{stripHexHash design.lightTheme.inputColor}}),
     inputForeground: Color(0xFF{{stripHexHash design.lightTheme.inputForegroundColor}}),
-    destructive: Color(0xFFFF0000), // Keep default destructive color
-    destructiveForeground: Color(0xFFFFFFFF), // Keep default destructive foreground
-    productCard: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}), // Use card color for product card
+    destructive: Color(0xFFFF0000),
+    destructiveForeground: Color(0xFFFFFFFF),
+    success: Color(0xFF22C55E),
+    successForeground: Color(0xFFFFFFFF),
+    productCard: Color(0xFF{{stripHexHash design.lightTheme.cardColor}}),
   );
 
-  // Dark theme colors based on config
+  // Dark theme colors
   static const darkColors = AppColorsData(
     background: Color(0xFF{{stripHexHash design.darkTheme.backgroundColor}}),
     foreground: Color(0xFF{{stripHexHash design.darkTheme.foregroundColor}}),
     primary: Color(0xFF{{stripHexHash design.darkTheme.primaryColor}}),
     primaryForeground: Color(0xFF{{stripHexHash design.darkTheme.primaryForegroundColor}}),
-    secondary: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}), // Use card color as secondary
+    secondary: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}),
     secondaryForeground: Color(0xFF{{stripHexHash design.darkTheme.cardForegroundColor}}),
-    accent: Color(0xFF{{stripHexHash design.darkTheme.primaryColor}}), // Use primary color as accent
+    accent: Color(0xFF{{stripHexHash design.darkTheme.primaryColor}}),
     accentForeground: Color(0xFF{{stripHexHash design.darkTheme.primaryForegroundColor}}),
     muted: Color(0xFF{{stripHexHash design.darkTheme.mutedColor}}),
     mutedForeground: Color(0xFF{{stripHexHash design.darkTheme.mutedForegroundColor}}),
@@ -45,9 +51,11 @@ class AppTheme {
     border: Color(0xFF{{stripHexHash design.darkTheme.borderColor}}),
     input: Color(0xFF{{stripHexHash design.darkTheme.inputColor}}),
     inputForeground: Color(0xFF{{stripHexHash design.darkTheme.inputForegroundColor}}),
-    destructive: Color(0xFFff1a1a), // Keep default destructive color
-    destructiveForeground: Color(0xFFFFFFFF), // Keep default destructive foreground
-    productCard: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}), // Use card color for product card
+    destructive: Color(0xFFff1a1a),
+    destructiveForeground: Color(0xFFFFFFFF),
+    success: Color(0xFF16A34A),
+    successForeground: Color(0xFFFFFFFF),
+    productCard: Color(0xFF{{stripHexHash design.darkTheme.cardColor}}),
   );
 
   // Light theme text styles
@@ -148,8 +156,7 @@ class AppTheme {
       height: 1.5,
     ),
   );
-  
-  // Dark theme text styles
+    // Dark theme text styles
   static const darkTextStyles = AppTextStylesData(
     h1: TextStyle(
       fontFamily: AppTypography.primaryFont,
@@ -297,30 +304,27 @@ class AppTheme {
           color: colors.mutedForeground,
         ),
         fillColor: colors.input,
-        filled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular({{ design.radius}}),
+        filled: true,        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(globalInputsRadius),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular({{ design.radius}}),
+          borderRadius: BorderRadius.circular(globalInputsRadius),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular({{ design.radius}}),
+          borderRadius: BorderRadius.circular(globalInputsRadius),
           borderSide: BorderSide(color: colors.primary),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular({{ design.radius}}),
+          borderRadius: BorderRadius.circular(globalInputsRadius),
           borderSide: BorderSide(color: colors.destructive),
         ),
-      ),
-
-      // Add global button themes
+      ),      // Add global button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular({{ design.radius}}),
+            borderRadius: BorderRadius.circular(globalButtonsRadius),
           ),
           padding: const EdgeInsets.symmetric(
             vertical: UIConfig.paddingMedium,
@@ -333,7 +337,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular({{ design.radius}}),
+            borderRadius: BorderRadius.circular(globalButtonsRadius),
           ),
         ),
       ),
@@ -341,7 +345,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular({{ design.radius}}),
+            borderRadius: BorderRadius.circular(globalButtonsRadius),
           ),
           padding: const EdgeInsets.symmetric(
             vertical: UIConfig.paddingMedium,

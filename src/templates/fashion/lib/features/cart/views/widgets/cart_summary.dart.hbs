@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class CartSummary extends StatelessWidget {
   final double subtotal;
@@ -20,53 +24,89 @@ class CartSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = LocalizationService.isRtl(context);
+
     return Container(
-      margin: const EdgeInsets.only(top: 16),
+      margin: EdgeInsets.only(top: UIConfig.marginMedium),
       child: Column(
+        crossAxisAlignment:
+            isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          _buildSummaryRow('Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
-          _buildSummaryRow('Shipping Cost', '\$${shippingCost.toStringAsFixed(2)}'),
-          _buildSummaryRow('Tax', '\$${tax.toStringAsFixed(2)}'),
+          _buildSummaryRow(
+            context,
+            'cart.subtotal'.translate(),
+            '\$${subtotal.toStringAsFixed(2)}',
+          ),
+          _buildSummaryRow(
+            context,
+            'cart.shipping_cost'.translate(),
+            '\$${shippingCost.toStringAsFixed(2)}',
+          ),
+          _buildSummaryRow(
+            context,
+            'cart.tax'.translate(),
+            '\$${tax.toStringAsFixed(2)}',
+          ),
           if (discount > 0)
             _buildSummaryRow(
-              couponCode != null ? 'Discount ($couponCode)' : 'Discount',
+              context,
+              couponCode != null
+                  ? '${'cart.discount'.translate()} ($couponCode)'
+                  : 'cart.discount'.translate(),
               '-\$${discount.toStringAsFixed(2)}',
-              valueColor: Colors.green,
+              valueColor: AppColors.accent(context),
             ),
-          const Divider(),
-          _buildSummaryRow('Total', '\$${total.toStringAsFixed(2)}', isTotal: true),
+          Divider(color: AppColors.border(context)),
+          _buildSummaryRow(
+            context,
+            'cart.total'.translate(),
+            '\$${total.toStringAsFixed(2)}',
+            isTotal: true,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildSummaryRow(
+    BuildContext context,
     String label,
     String value, {
     bool isTotal = false,
     Color? valueColor,
   }) {
+    final bool isRtl = LocalizationService.isRtl(context);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(
+        vertical: UIConfig.paddingSmall * 0.75,
+      ), // 6.0
       child: Row(
+        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-              fontFamily: 'Poppins',
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              TextStyle(
+                fontSize: UIConfig.fontSizeMedium,
+                color: AppColors.mutedForeground(context),
+                fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
+                fontFamily: 'Poppins',
+              ),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 16,
-              color: valueColor,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-              fontFamily: 'Poppins',
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              TextStyle(
+                fontSize: UIConfig.fontSizeMedium,
+                color: valueColor ?? AppColors.foreground(context),
+                fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
+                fontFamily: 'Poppins',
+              ),
             ),
           ),
         ],
@@ -74,3 +114,4 @@ class CartSummary extends StatelessWidget {
     );
   }
 }
+

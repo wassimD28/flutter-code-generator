@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/connection_service.dart';
 import 'package:{{ snakeCase appName }}/app/shared/widgets/bottom_nav_bar.dart';
 import 'package:{{ snakeCase appName }}/app/shared/controllers/navigation_controller.dart';
 import 'package:{{ snakeCase appName }}/features/home/views/screen/home_screen.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/views/wishlist_screen.dart';
 import 'package:{{ snakeCase appName }}/features/cart/views/screen/cart_screen.dart';
 import 'package:{{ snakeCase appName }}/features/profile/views/screens/profile_screen.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class MainContainerScreen extends StatelessWidget {
   final NavigationController navigationController =
@@ -19,19 +24,66 @@ class MainContainerScreen extends StatelessWidget {
     CartScreen(),
     ProfilePage(),
   ];
+  final ConnectionService connectionService = Get.find<ConnectionService>();
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       int currentIndex = navigationController.selectedIndex.value;
+      bool isConnected = connectionService.isConnected.value;
 
       return Scaffold(
         body: IndexedStack(index: currentIndex, children: _screens),
-        bottomNavigationBar: BottomNavBar(
-          currentIndex: currentIndex,
-          onTabChange: navigationController.changeTab,
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Connection banner above the bottom nav bar
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: !isConnected ? 36 : 0,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.destructive(context),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppTheme.globalRadius),
+                  topRight: Radius.circular(AppTheme.globalRadius),
+                ),
+              ),
+              child:
+                  !isConnected
+                      ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.wifi_off,
+                            color: AppColors.destructiveForeground(context),
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'common.no_internet_connection'.translate(),
+                            style: LocalizationService.getLocalizedTextStyle(
+                              context,
+                              TextStyle(
+                                color: AppColors.destructiveForeground(context),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                      : null,
+            ),
+            // Bottom navigation bar
+            BottomNavBar(
+              currentIndex: currentIndex,
+              onTabChange: navigationController.changeTab,
+            ),
+          ],
         ),
       );
     });
   }
 }
+

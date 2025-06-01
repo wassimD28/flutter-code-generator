@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/assets_config.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
 import 'package:{{ snakeCase appName }}/features/address/controller/address_controller.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/shared/widgets/theme_aware_svg.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class AddressPage extends StatelessWidget {
   const AddressPage({super.key});
@@ -11,6 +15,7 @@ class AddressPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final AddressController controller = Get.put(AddressController());
     final isLoading = true.obs;
+    final bool isRtl = LocalizationService.isRtl(context);
 
     controller.fetchAddresses().then((_) => isLoading.value = false);
 
@@ -19,134 +24,118 @@ class AddressPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background(context),
         elevation: 0,
-        leading: Container(
-          margin: EdgeInsets.only(left: UIConfig.marginMedium),
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppColors.mutedForeground(context),
-            shape: BoxShape.circle,
+        leading: IconButton(
+          icon: ThemeAwareSvg(
+            assetPath: isRtl ? AssetConfig.arrowRight : AssetConfig.arrowLeft,
+            height: 24,
+            width: 24,
           ),
-          child: IconButton(
-            icon: Icon(Icons.arrow_back_ios, 
-              color: AppColors.foreground(context), 
-              size: 20),
-            onPressed: () => Get.back(),
-          ),
+          onPressed: () => Get.back(),
         ),
+        centerTitle: true,
         title: Text(
-          'Address',
-          style: TextStyle(
-            color: AppColors.foreground(context),
-            fontSize: UIConfig.fontSizeMedium,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
+          'address.title'.translate(),
+          style: LocalizationService.getLocalizedTextStyle(
+            context,
+            TextStyle(
+              color: AppColors.foreground(context),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          controller.clearFields();
+          Get.toNamed('/add-address');
+        },
+        backgroundColor: AppColors.primary(context),
+        child: Icon(Icons.add, color: AppColors.primaryForeground(context)),
+      ),
       body: Obx(
-        () => isLoading.value
-            ? Center(child: CircularProgressIndicator(
-                color: AppColors.primary(context),
-              ))
-            : Padding(
-                padding: EdgeInsets.symmetric(horizontal: UIConfig.paddingLarge),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: UIConfig.marginLarge),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            controller.clearFields();
-                            Get.toNamed('/add-address');
-                          },
-                          child: Text(
-                            'Add Address',
-                            style: TextStyle(
-                              fontSize: UIConfig.fontSizeMedium,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Gabarito',
-                              color: AppColors.foreground(context),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: UIConfig.marginMedium),
-                    Expanded(
-                      child: controller.addresses.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No addresses added yet',
-                                style: TextStyle(
-                                  color: AppColors.mutedForeground(context),
-                                  fontSize: UIConfig.fontSizeRegular,
-                                  fontFamily: 'Poppins',
-                                ),
-                              ),
-                            )
-                          : ListView.separated(
-                              itemCount: controller.addresses.length,
-                              separatorBuilder: (context, index) => 
-                                SizedBox(height: UIConfig.marginSmall),
-                              itemBuilder: (context, index) {
-                                final address = controller.addresses[index];
-                                return _buildAddressCard(
-                                  context,
-                                  address.formattedAddress,
-                                  onEdit: () {
-                                    controller.setAddressForEditing(address);
-                                    Get.toNamed('/edit-address');
-                                  },
-                                );
-                              },
-                            ),
-                    ),
-                 
-                  ],
+        () =>
+            isLoading.value
+                ? Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary(context),
+                  ),
+                )
+                : Padding(
+                  padding: EdgeInsets.all(UIConfig.paddingLarge),
+                  child:
+                      controller.addresses.isEmpty
+                          ? _buildEmptyState(context)
+                          : _buildAddressList(context, controller),
                 ),
-              ),
       ),
     );
   }
 
-  Widget _buildAddressCard(BuildContext context, String address, {required VoidCallback onEdit}) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: UIConfig.paddingMedium,
-        vertical: UIConfig.paddingMedium
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.mutedForeground(context),
-        borderRadius: BorderRadius.circular(UIConfig.borderRadiusMedium),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: Text(
-              address,
-              style: TextStyle(
-                fontSize: UIConfig.fontSizeRegular,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'Poppins',
+          Icon(
+            Icons.location_on_outlined,
+            size: 80,
+            color: AppColors.muted(context),
+          ),
+          SizedBox(height: UIConfig.marginLarge),
+          Text(
+            'address.no_addresses'.translate(),
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              TextStyle(
                 color: AppColors.foreground(context),
+                fontSize: UIConfig.fontSizeLarge,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins',
               ),
             ),
           ),
-          GestureDetector(
-            onTap: onEdit,
-            child: Text(
-              'Edit',
-              style: TextStyle(
-                fontSize: UIConfig.fontSizeSmall,
-                fontWeight: FontWeight.w600,
+          SizedBox(height: UIConfig.marginSmall),
+          Text(
+            'address.add_first_address'.translate(),
+            textAlign: TextAlign.center,
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              TextStyle(
+                color: AppColors.mutedForeground(context),
+                fontSize: UIConfig.fontSizeRegular,
                 fontFamily: 'Poppins',
-                color: AppColors.foreground(context),
+              ),
+            ),
+          ),
+          SizedBox(height: UIConfig.marginLarge),
+          ElevatedButton(
+            onPressed: () {
+              Get.toNamed('/add-address');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary(context),
+              foregroundColor: AppColors.primaryForeground(context),
+              padding: EdgeInsets.symmetric(
+                horizontal: UIConfig.paddingLarge,
+                vertical: UIConfig.paddingMedium,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  UIConfig.borderRadiusCircular,
+                ),
+              ),
+            ),
+            child: Text(
+              'address.add_address'.translate(),
+              style: LocalizationService.getLocalizedTextStyle(
+                context,
+                TextStyle(
+                  fontSize: UIConfig.fontSizeMedium,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Poppins',
+                ),
               ),
             ),
           ),
@@ -154,4 +143,181 @@ class AddressPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildAddressCard(
+    BuildContext context,
+    String address, {
+    bool isDefault = false,
+    required VoidCallback onEdit,
+    required String id,
+    required AddressController controller,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(UIConfig.paddingMedium),
+      decoration: BoxDecoration(
+        color: AppColors.card(context),
+        borderRadius: BorderRadius.circular(UIConfig.borderRadiusMedium),
+        border: Border.all(
+          color:
+              isDefault
+                  ? AppColors.primary(context)
+                  : AppColors.border(context),
+          width: isDefault ? 2 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (isDefault)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: UIConfig.paddingSmall,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary(context),
+                    borderRadius: BorderRadius.circular(
+                      UIConfig.borderRadiusSmall,
+                    ),
+                  ),
+                  child: Text(
+                    'address.default'.translate(),
+                    style: LocalizationService.getLocalizedTextStyle(
+                      context,
+                      TextStyle(
+                        color: AppColors.primaryForeground(context),
+                        fontSize: UIConfig.fontSizeSmall,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ),
+                ),
+              if (!isDefault)
+                GestureDetector(
+                  onTap: () => controller.setDefaultAddress(id),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: UIConfig.paddingSmall,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary(context).withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(
+                        UIConfig.borderRadiusSmall,
+                      ),
+                    ),
+                    child: Text(
+                      'address.set_as_default'.translate(),
+                      style: LocalizationService.getLocalizedTextStyle(
+                        context,
+                        TextStyle(
+                          fontSize: UIConfig.fontSizeSmall,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins',
+                          color: AppColors.primary(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: UIConfig.marginSmall),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  address,
+                  style: LocalizationService.getLocalizedTextStyle(
+                    context,
+                    TextStyle(
+                      fontSize: UIConfig.fontSizeRegular,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Poppins',
+                      color: AppColors.foreground(context),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: UIConfig.marginSmall),
+              GestureDetector(
+                onTap: onEdit,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: UIConfig.paddingSmall,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary(context),
+                    borderRadius: BorderRadius.circular(
+                      UIConfig.borderRadiusSmall,
+                    ),
+                  ),
+                  child: Text(
+                    'address.edit'.translate(),
+                    style: LocalizationService.getLocalizedTextStyle(
+                      context,
+                      TextStyle(
+                        fontSize: UIConfig.fontSizeSmall,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
+                        color: AppColors.primary(context),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddressList(BuildContext context, AddressController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'address.saved_addresses'.translate(),
+          style: LocalizationService.getLocalizedTextStyle(
+            context,
+            TextStyle(
+              color: AppColors.foreground(context),
+              fontSize: UIConfig.fontSizeMedium,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
+          ),
+        ),
+        SizedBox(height: UIConfig.marginMedium),
+        Expanded(
+          child: ListView.separated(
+            itemCount: controller.addresses.length,
+            separatorBuilder:
+                (context, index) => SizedBox(height: UIConfig.marginMedium),
+            itemBuilder: (context, index) {
+              final address = controller.addresses[index];
+              return _buildAddressCard(
+                context,
+                address.formattedAddress,
+                isDefault: address.isDefault,
+                id: address.id ?? '',
+                controller: controller,
+                onEdit: () {
+                  controller.setAddressForEditing(address);
+                  Get.toNamed('/edit-address');
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }
+

@@ -85,7 +85,7 @@ class AuthService {
 
       // Proceed with sign-out
       await _tokenManager.clearAllTokens();
-      _logger.i('Log out successful');
+      _logger.d('Log out successful');
       Get.offAllNamed(AppRoute.login);
     } catch (e) {
       _logger.e('Failed to log out: $e');
@@ -108,13 +108,14 @@ class AuthService {
 
       // Decode the JWT to extract user ID
       final decodedToken = JwtDecoder.decode(accessToken);
-      final userId = decodedToken['sub']?.toString() ?? decodedToken['id']?.toString();
+      final userId =
+          decodedToken['sub']?.toString() ?? decodedToken['id']?.toString();
       if (userId == null) {
         _logger.w('User ID not found in JWT payload');
         return null;
       }
 
-      _logger.i('Retrieved user ID: $userId');
+      _logger.d('Retrieved user ID: $userId');
       return userId;
     } catch (e) {
       _logger.e('Error decoding JWT for user ID: $e');
@@ -146,4 +147,66 @@ class AuthService {
       _logger.e('Error in handleAppResume: $e');
     }
   }
+
+  // Request password reset OTP
+  Future<bool> requestPasswordResetOTP(String email) async {
+    try {
+      final response = await _apiClient.requestPasswordResetOTP(email: email);
+
+      if (response.statusCode == 200) {
+        _notificationService.showSuccess('OTP code sent to your email');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _logger.e('Failed to request password reset OTP: $e');
+      _errorHandler.handleSignInError(e);
+      return false;
+    }
+  }
+
+  // Verify OTP code
+  Future<Map<String, dynamic>?> verifyOTPCode(
+    String email,
+    String otpCode,
+  ) async {
+    try {
+      final response = await _apiClient.verifyOTPCode(
+        email: email,
+        otpCode: otpCode,
+      );
+
+      if (response.statusCode == 200) {
+        _notificationService.showSuccess('OTP verified successfully');
+        // Return the userId from response
+        return {'userId': response.data['userId']};
+      }
+      return null;
+    } catch (e) {
+      _logger.e('Failed to verify OTP code: $e');
+      _errorHandler.handleSignInError(e);
+      return null;
+    }
+  }
+
+  // Reset password
+  Future<bool> resetPassword(String userId, String newPassword) async {
+    try {
+      final response = await _apiClient.resetPassword(
+        userId: userId,
+        newPassword: newPassword,
+      );
+
+      if (response.statusCode == 200) {
+        _notificationService.showSuccess('Password reset successfully');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _logger.e('Failed to reset password: $e');
+      _errorHandler.handleSignInError(e);
+      return false;
+    }
+  }
 }
+

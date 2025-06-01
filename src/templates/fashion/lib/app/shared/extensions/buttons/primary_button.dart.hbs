@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/app_color_extension.dart';
 
@@ -13,14 +15,17 @@ extension StyledButton on Widget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        textStyle: const TextStyle(
-          fontSize: UIConfig.fontSizeMedium,
-          fontWeight: FontWeight.bold,
+        textStyle: LocalizationService.getLocalizedTextStyle(
+          context,
+          TextStyle(
+            fontSize: UIConfig.fontSizeMedium,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: colors?.primary,
         foregroundColor: colors?.primaryForeground,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(UIConfig.borderRadiusCircular),
+          borderRadius: BorderRadius.circular(AppTheme.globalButtonsRadius),
         ),
         padding: const EdgeInsets.symmetric(vertical: UIConfig.paddingMedium),
       ),

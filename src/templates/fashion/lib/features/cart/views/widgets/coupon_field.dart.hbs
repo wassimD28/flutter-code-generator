@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:{{ snakeCase appName }}/app/core/config/assets_config.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_color_utils.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/shared/widgets/theme_aware_svg.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class CouponField extends StatefulWidget {
   final Function(String) onApplyCoupon;
@@ -20,47 +26,84 @@ class CouponField extends StatefulWidget {
 
 class _CouponFieldState extends State<CouponField> {
   late TextEditingController _controller;
+  final FocusNode _focusNode = FocusNode();
+  bool _isFocused = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.initialValue);
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = LocalizationService.isRtl(context);
+
     return Container(
-      height: 56,
-      margin: const EdgeInsets.only(top: 16),
+      height: 48, // Adjusted for consistent height
+      margin: EdgeInsets.only(top: UIConfig.marginMedium),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.input(context),
+        borderRadius: BorderRadius.circular(UIConfig.borderRadiusMedium),
+        border: Border.all(
+          color: _isFocused ? AppColors.primary(context) : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       child: Row(
+        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(width: 16),
+          SizedBox(width: UIConfig.paddingMedium),
           SvgPicture.asset(
             AssetConfig.discountShape,
-            width: 20,
-            height: 20,
-            colorFilter: ColorFilter.mode(Colors.green[400]!, BlendMode.srcIn),
+            width: 30,
+            height: 30,
+            colorFilter: ColorFilter.mode(
+              AppColors.mutedForeground(context),
+              BlendMode.srcIn,
+            ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: UIConfig.paddingSmall * 1.5),
           Expanded(
             child: TextField(
               controller: _controller,
-              decoration: const InputDecoration(
-                hintText: 'Enter Coupon Code',
+              focusNode: _focusNode,
+              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+              textAlign: isRtl ? TextAlign.right : TextAlign.left,
+              decoration: InputDecoration(
+                hintText: 'cart.enter_coupon'.translate(),
                 border: InputBorder.none,
-                hintStyle: TextStyle(
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true, // Helps with vertical centering
+                contentPadding: EdgeInsets.zero,
+                hintStyle: LocalizationService.getLocalizedTextStyle(
+                  context,
+                  TextStyle(
+                    fontSize: 14,
+                    color: AppColors.mutedForeground(context),
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ),
+              style: LocalizationService.getLocalizedTextStyle(
+                context,
+                TextStyle(
                   fontSize: 14,
-                  color: Colors.grey,
+                  color: AppColors.inputForeground(context),
                   fontFamily: 'Poppins',
                 ),
               ),
@@ -68,37 +111,39 @@ class _CouponFieldState extends State<CouponField> {
             ),
           ),
           GestureDetector(
-            onTap: widget.isLoading 
-                ? null 
-                : () => widget.onApplyCoupon(_controller.text),
+            onTap:
+                widget.isLoading
+                    ? null
+                    : () => widget.onApplyCoupon(_controller.text),
             child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: widget.isLoading ? Colors.grey : Colors.black,
-                shape: BoxShape.circle,
-              ),
-              child: widget.isLoading
-                  ? const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              child:
+                  widget.isLoading
+                      ? Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: CircularProgressIndicator(
+                          color: AppColors.mutedForeground(context),
+                          strokeWidth: 2,
+                        ),
+                      )
+                      : Center(
+                        child: ThemeAwareSvg(
+                          assetPath:
+                              isRtl
+                                  ? AssetConfig.arrowLeft
+                                  : AssetConfig.arrowRight,
+                          width: 16,
+                          height: 16,
+                          colorName: AppColorName.foreground,
+                        ),
                       ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: SvgPicture.asset(
-                        AssetConfig.arrowRight2,
-                        width: 20,
-                        height: 20,
-                      ),
-                    ),
             ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
     );
   }
 }
+

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
 import 'package:{{ snakeCase appName }}/features/filter/controllers/product_filter_controller.dart';
 import 'package:{{ snakeCase appName }}/features/filter/view/widgets/thumb_shape.dart';
+import 'dart:developer' as developer; 
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+
 class PriceRangeSlider extends StatelessWidget {
   final ProductFilterController filterController;
 
@@ -9,19 +15,23 @@ class PriceRangeSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = LocalizationService.isRtl(context);
+
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: UIConfig.paddingMedium,
+          ),
           child: Obx(
             () => SliderTheme(
               data: SliderThemeData(
                 trackHeight: 2,
-                activeTrackColor: Colors.black,
-                inactiveTrackColor: Colors.grey[300],
-                thumbColor: Colors.white,
+                activeTrackColor: AppColors.primary(context),
+                inactiveTrackColor: AppColors.border(context),
+                thumbColor: AppColors.background(context),
                 thumbShape: CustomThumbShape(),
-                overlayColor: Colors.black.withOpacity(0.1),
+                overlayColor: AppColors.primary(context).withOpacity(0.1),
                 rangeThumbShape: const RoundRangeSliderThumbShape(
                   enabledThumbRadius: 12,
                   elevation: 4,
@@ -36,47 +46,67 @@ class PriceRangeSlider extends StatelessWidget {
                 max: 1000,
                 divisions: 20,
                 labels: RangeLabels(
-                  '${filterController.minPrice.value.toStringAsFixed(0)} TND',
-                  '${filterController.maxPrice.value.toStringAsFixed(0)} TND',
+                  '${filterController.minPrice.value.toStringAsFixed(0)} ${'filter.currency'.translate()}',
+                  '${filterController.maxPrice.value.toStringAsFixed(0)} ${'filter.currency'.translate()}',
                 ),
                 onChanged: (RangeValues values) {
+                  // Update the filter controller values with the selected range
                   filterController.minPrice.value = values.start;
                   filterController.maxPrice.value = values.end;
+                  // Log the updated values for debugging
+                  developer.log(
+                    'Price range updated: min=${values.start.toStringAsFixed(0)}, max=${values.end.toStringAsFixed(0)}',
+                    name: 'PriceRangeSlider.onChanged',
+                  );
+                  // Ensure values are properly updated in the controller
+                  filterController.update(); // Force update using GetX
                 },
               ),
             ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: UIConfig.paddingMedium,
+          ),
           child: Row(
+            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Obx(
                 () => Text(
                   filterController.minPrice.value.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  style: LocalizationService.getLocalizedTextStyle(
+                    context,
+                    TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: UIConfig.fontSizeRegular,
+                      color: AppColors.foreground(context),
+                    ),
                   ),
                 ),
               ),
-              const Text(
-                'Tnd',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: Colors.black,
+              Text(
+                'filter.currency'.translate(),
+                style: LocalizationService.getLocalizedTextStyle(
+                  context,
+                  TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: UIConfig.fontSizeRegular,
+                    color: AppColors.foreground(context),
+                  ),
                 ),
               ),
               Obx(
                 () => Text(
                   filterController.maxPrice.value.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  style: LocalizationService.getLocalizedTextStyle(
+                    context,
+                    TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: UIConfig.fontSizeRegular,
+                      color: AppColors.foreground(context),
+                    ),
                   ),
                 ),
               ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/app/core/config/assets_config.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
 import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
+import 'package:{{ snakeCase appName }}/app/shared/widgets/theme_aware_svg.dart';
 import 'package:{{ snakeCase appName }}/features/category/controllers/category_controller.dart';
 import 'package:{{ snakeCase appName }}/features/product/controllers/product_list_controller.dart';
 import 'package:{{ snakeCase appName }}/features/filter/controllers/product_filter_controller.dart';
@@ -12,20 +14,23 @@ import 'package:{{ snakeCase appName }}/features/home/views/widgets/skeleton_loa
 import 'package:{{ snakeCase appName }}/features/home/views/widgets/search_bar.dart';
 import 'package:{{ snakeCase appName }}/features/filter/view/screen/filter_product_sheet.dart';
 import 'package:{{ snakeCase appName }}/features/subcategory/controllers/subcategory_controller.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class ProductListScreen extends StatelessWidget {
   final ProductController productController = Get.find<ProductController>();
   late final ProductFilterController filterController;
   late final ProductListController listController;
   final CategoryController categoryController = Get.find<CategoryController>();
-  final SubcategoryController subcategoryController = Get.find<SubcategoryController>();
+  final SubcategoryController subcategoryController =
+      Get.find<SubcategoryController>();
 
   ProductListScreen({super.key}) {
     // Initialize controllers
     filterController = Get.put(
       ProductFilterController(productController: productController),
     );
-    
+
     listController = Get.put(
       ProductListController(
         productController: productController,
@@ -36,14 +41,16 @@ class ProductListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = LocalizationService.isRtl(context);
+
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(context, isRtl),
       body: _buildBody(context),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, bool isRtl) {
     return AppBar(
       backgroundColor: AppColors.background(context),
       elevation: 0,
@@ -51,18 +58,21 @@ class ProductListScreen extends StatelessWidget {
       title: Obx(
         () => Text(
           listController.title.value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.foreground(context),
+          style: LocalizationService.getLocalizedTextStyle(
+            context,
+            TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.foreground(context),
+            ),
           ),
         ),
       ),
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: AppColors.foreground(context),
-          size: 20,
+        icon: ThemeAwareSvg(
+          assetPath: isRtl ? AssetConfig.arrowRight : AssetConfig.arrowLeft,
+          height: 24,
+          width: 24,
         ),
         onPressed: () => Get.back(),
       ),
@@ -158,19 +168,25 @@ class ProductListScreen extends StatelessWidget {
           ),
           const SizedBox(height: UIConfig.paddingMedium),
           Text(
-            'No products found',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.mutedForeground(context),
+            'product.no_products_found'.translate(),
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.mutedForeground(context),
+              ),
             ),
           ),
           const SizedBox(height: UIConfig.paddingSmall),
           Text(
-            'Try adjusting your filters',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.mutedForeground(context),
+            'product.try_adjusting_filters'.translate(),
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              TextStyle(
+                fontSize: 14,
+                color: AppColors.mutedForeground(context),
+              ),
             ),
           ),
           const SizedBox(height: UIConfig.paddingLarge),
@@ -189,7 +205,13 @@ class ProductListScreen extends StatelessWidget {
                 ),
               ),
             ),
-            child: const Text('Clear Filters'),
+            child: Text(
+              'product.clear_filters'.translate(),
+              style: LocalizationService.getLocalizedTextStyle(
+                context,
+                const TextStyle(),
+              ),
+            ),
           ),
         ],
       ),
@@ -197,6 +219,8 @@ class ProductListScreen extends StatelessWidget {
   }
 
   Widget _buildErrorView(BuildContext context) {
+
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -210,10 +234,13 @@ class ProductListScreen extends StatelessWidget {
             child: Text(
               listController.errorMessage.value,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.mutedForeground(context),
+              style: LocalizationService.getLocalizedTextStyle(
+                context,
+                TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.mutedForeground(context),
+                ),
               ),
             ),
           ),
@@ -233,7 +260,13 @@ class ProductListScreen extends StatelessWidget {
                 ),
               ),
             ),
-            child: const Text('Try Again'),
+            child: Text(
+              'product.try_again'.translate(),
+              style: LocalizationService.getLocalizedTextStyle(
+                context,
+                const TextStyle(),
+              ),
+            ),
           ),
         ],
       ),
@@ -245,12 +278,13 @@ class ProductListScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FilterBottomSheet(
-        listController: listController,
-        filterController: filterController,
-        categoryController: categoryController,
-        subcategoryController: subcategoryController,
-      ),
+      builder:
+          (context) => FilterBottomSheet(
+            listController: listController,
+            filterController: filterController,
+            categoryController: categoryController,
+            subcategoryController: subcategoryController,
+          ),
     );
   }
 }
@@ -312,7 +346,8 @@ class _LoadingGrid extends StatelessWidget {
                     const SizedBox(height: 6),
                     SkeletonContainer.rectangular(
                       width: constraints.maxWidth * 0.5,
-                      height: 12),
+                      height: 12,
+                    ),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -338,3 +373,4 @@ class _LoadingGrid extends StatelessWidget {
     );
   }
 }
+

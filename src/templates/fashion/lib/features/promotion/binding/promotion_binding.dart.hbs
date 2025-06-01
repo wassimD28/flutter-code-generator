@@ -1,0 +1,14 @@
+import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/features/promotion/repositories/promotion_repository.dart';
+import 'package:{{ snakeCase appName }}/app/core/services/api_client.dart';
+
+class PromotionBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<PromotionRepository>(
+      () => PromotionRepository(
+        apiClient: Get.find<ApiClient>(),
+      ),
+    );
+  }
+}

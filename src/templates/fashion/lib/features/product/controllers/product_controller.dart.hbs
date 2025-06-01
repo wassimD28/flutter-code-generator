@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:{{ snakeCase appName }}/features/product/models/product_model.dart';
 import 'package:{{ snakeCase appName }}/features/product/repositories/product_repository.dart';
+import 'package:{{ snakeCase appName }}/features/promotion/repositories/promotion_repository.dart';
 import 'dart:developer' as developer;
 
 class ProductController extends GetxController {
@@ -18,8 +19,12 @@ class ProductController extends GetxController {
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
 
-  ProductController({required ProductRepository repository}) : _repository = repository;
 
+
+  ProductController({
+    required ProductRepository repository,
+    required PromotionRepository promotionRepository,
+  })  : _repository = repository;
   @override
   void onInit() {
     super.onInit();

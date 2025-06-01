@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
 import 'package:{{ snakeCase appName }}/features/profile/controllers/edit_profile_controller.dart';
 import 'package:{{ snakeCase appName }}/features/profile/views/widgets/profile_edit_widgets/custom_form_field.dart';
 import 'package:{{ snakeCase appName }}/features/profile/views/widgets/profile_edit_widgets/dropdown_row.dart';
 import 'package:{{ snakeCase appName }}/features/profile/views/widgets/profile_edit_widgets/phone_field.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
 
 class ProfileForm extends StatelessWidget {
   final EditProfileController controller;
@@ -19,25 +21,36 @@ class ProfileForm extends StatelessWidget {
     required this.onCountryChanged,
     required this.onGenderChanged,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Full name field
         CustomFormField(
-          label: 'Full name',
+          label: 'profile.full_name'.translate(),
           controller: controller.fullNameController,
         ),
-        const SizedBox(height: 16),
-        CustomFormField(
-          label: 'Nick name',
-          controller: controller.userNameController,
-        ),
-        const SizedBox(height: 16),
-        CustomFormField(label: 'Email', controller: controller.emailController),
-        const SizedBox(height: 16),
+        SizedBox(height: UIConfig.marginLarge),
+
+        // Phone field with custom icon
         PhoneField(controller: controller.phoneController),
-        const SizedBox(height: 16),
+        SizedBox(height: UIConfig.marginLarge),
+
+        // Date of birth field with date picker
+        GestureDetector(
+          onTap: () => controller.selectDateOfBirth(context),
+          child: AbsorbPointer(
+            child: CustomFormField(
+              label: 'profile.date_of_birth'.translate(),
+              controller: controller.dateOfBirthController,
+              readOnly: true,
+            ),
+          ),
+        ),
+        SizedBox(height: UIConfig.marginLarge),
+
+        // Country and Gender dropdowns
         DropdownRow(
           selectedCountry: selectedCountry,
           selectedGender: selectedGender,

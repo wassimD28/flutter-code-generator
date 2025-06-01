@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/app_theme_colors.dart';
+import 'package:{{ snakeCase appName }}/app/core/theme/ui_config.dart';
 import 'package:{{ snakeCase appName }}/features/search/no_search_result.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/controllers/wishlist_controller.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/models/wishlist_item_model.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/views/widget/empty_wishlist_view.dart';
 import 'package:{{ snakeCase appName }}/features/wishlist/views/widget/wishlist_header.dart';
-import 'package:{{ snakeCase appName }}/features/wishlist/views/widget/wishlist_item_tile.dart';
+import 'package:{{ snakeCase appName }}/features/wishlist/views/widget/wishlist_item_card.dart'; // Updated import
+import 'package:{{ snakeCase appName }}/app/core/localization/translation_extension.dart';
+import 'package:{{ snakeCase appName }}/app/core/localization/localization_service.dart';
 
 class WishlistPage extends StatefulWidget {
   const WishlistPage({super.key});
@@ -20,7 +24,7 @@ class _WishlistScreenState extends State<WishlistPage> {
   @override
   void initState() {
     super.initState();
-    
+
     // Get the instance of the controller
     _wishlistController = Get.find<WishlistController>();
     // Clear any temporary items
@@ -35,50 +39,66 @@ class _WishlistScreenState extends State<WishlistPage> {
     _wishlistController.filterWishlistItems(searchText);
   }
 
-  // Method to update item quantity (kept for UI functionality)
-  void _updateQuantity(WishlistItemModel item, int delta) {
-    // In this implementation, quantity is just a UI state
-    // It's not sent to the server, as the API doesn't support quantity for wishlist
-    // This functionality could be moved to a shopping cart feature in the future
-  }
-
   // Method to remove item from wishlist
   void _removeItem(WishlistItemModel item) {
     _wishlistController.removeFromWishlist(item.productId);
   }
 
+  // Navigate to product details
+  void _onItemTap(WishlistItemModel item) {
+    Get.toNamed('/products/${item.productId}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        title: const Text(
-          'My Wishlist',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+        title: Text(
+          'wishlist.title'.translate(),
+          style: LocalizationService.getLocalizedTextStyle(
+            context,
+            Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.foreground(context),
+                  fontWeight: FontWeight.w500,
+                ) ??
+                TextStyle(
+                  color: AppColors.foreground(context),
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
         ),
         centerTitle: true,
       ),
-      body: Obx(() {
-        // Show loading indicator when loading
-        if (_wishlistController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: GestureDetector(
+        // Dismiss keyboard when tapping anywhere on the screen
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Obx(() {
+          // Show loading indicator when loading
+          if (_wishlistController.isLoading.value) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary(context),
+              ),
+            );
+          }
 
-        // Show error message when there's an error
-        if (_wishlistController.hasError.value) {
-          return _buildErrorView();
-        }
+          // Show error message when there's an error
+          if (_wishlistController.hasError.value) {
+            return _buildErrorView();
+          }
 
-        // Show empty state when wishlist is empty
-        if (_wishlistController.wishlistItems.isEmpty) {
-          return const EmptyWishlistView();
-        }
+          // Show empty state when wishlist is empty
+          if (_wishlistController.wishlistItems.isEmpty) {
+            return const EmptyWishlistView();
+          }
 
-        // Show wishlist items
-        return _buildWishlistContent();
-      }),
+          // Show wishlist items
+          return _buildWishlistContent();
+        }),
+      ),
     );
   }
 
@@ -87,11 +107,38 @@ class _WishlistScreenState extends State<WishlistPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Error: ${_wishlistController.errorMessage.value}'),
-          const SizedBox(height: 16),
+          Text(
+            '${'wishlist.error_loading'.translate()}${_wishlistController.errorMessage.value}',
+            style: LocalizationService.getLocalizedTextStyle(
+              context,
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.destructive(context),
+                  ) ??
+                  TextStyle(color: AppColors.destructive(context)),
+            ),
+          ),
+          const SizedBox(height: UIConfig.paddingMedium),
           ElevatedButton(
             onPressed: () => _wishlistController.fetchWishlistItems(),
-            child: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary(context),
+              foregroundColor: AppColors.primaryForeground(context),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  UIConfig.borderRadiusCircular,
+                ),
+              ),
+            ),
+            child: Text(
+              'common.retry'.translate(),
+              style: LocalizationService.getLocalizedTextStyle(
+                context,
+                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.primaryForeground(context),
+                    ) ??
+                    TextStyle(color: AppColors.primaryForeground(context)),
+              ),
+            ),
           ),
         ],
       ),
@@ -99,7 +146,11 @@ class _WishlistScreenState extends State<WishlistPage> {
   }
 
   Widget _buildWishlistContent() {
+    final bool isRtl = LocalizationService.isRtl(context);
+
     return Column(
+      crossAxisAlignment:
+          isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         // Wishlist header with search bar
         WishlistHeader(onSearch: _filterItems),
@@ -107,10 +158,12 @@ class _WishlistScreenState extends State<WishlistPage> {
         // Wishlist items list
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: UIConfig.paddingMedium,
+            ),
             child: Obx(() {
               // No items after filtering (search with no results)
-              if (_wishlistController.filteredWishlistItems.isEmpty && 
+              if (_wishlistController.filteredWishlistItems.isEmpty &&
                   _wishlistController.wishlistItems.isNotEmpty) {
                 return NoSearchResult(
                   onExploreCategories: () {
@@ -125,11 +178,11 @@ class _WishlistScreenState extends State<WishlistPage> {
                 itemCount: _wishlistController.filteredWishlistItems.length,
                 itemBuilder: (context, index) {
                   final item = _wishlistController.filteredWishlistItems[index];
-                  return WishlistItemTile(
+                  return WishlistItemCard(
                     key: ValueKey(item.id),
                     item: item,
                     onRemove: _removeItem,
-                    onUpdateQuantity: _updateQuantity,
+                    onTap: _onItemTap,
                   );
                 },
               );
@@ -140,3 +193,4 @@ class _WishlistScreenState extends State<WishlistPage> {
     );
   }
 }
+

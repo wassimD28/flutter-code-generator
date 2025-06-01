@@ -3,10 +3,6 @@
     "core": [
       {
         "name": ".env",
-        "path": ".env.example"
-      },
-      {
-        "name": ".env",
         "path": ".env"
       },
       {
@@ -94,8 +90,16 @@
         "path": "lib/app/shared/widgets/bottom_nav_bar.dart"
       },
       {
+        "name": "Connection Banner",
+        "path": "lib/app/shared/widgets/connection_banner.dart"
+      },
+      {
         "name": "Rating Stars",
         "path": "lib/app/shared/widgets/rating_stars.dart"
+      },
+      {
+        "name": "Rtl Aware App Bar",
+        "path": "lib/app/shared/widgets/rtl_aware_app_bar.dart"
       },
       {
         "name": "Universal Cached Image",
@@ -104,10 +108,6 @@
       {
         "name": "Auth Email Reset Password",
         "path": "lib/features/auth/controllers/email_reset_password.dart"
-      },
-      {
-        "name": "Auth Forget Password",
-        "path": "lib/features/auth/controllers/forget_password.dart"
       },
       {
         "name": "Auth Reset Password",
@@ -132,6 +132,10 @@
       {
         "name": "Cart Item Card",
         "path": "lib/features/cart/views/widgets/cart_item_card.dart"
+      },
+      {
+        "name": "Cart Promotion Section",
+        "path": "lib/features/cart/views/widgets/cart_promotion_section.dart"
       },
       {
         "name": "Cart Summary",
@@ -182,8 +186,12 @@
         "path": "lib/features/language/views/widgets/language_card.dart"
       },
       {
-        "name": "Notifications Empty Notification State.dart",
-        "path": "lib/features/notifications/views/widgets/empty_notification_state.dart.dart"
+        "name": "Notifications Empty Notification State",
+        "path": "lib/features/notifications/views/widgets/empty_notification_state.dart"
+      },
+      {
+        "name": "Notifications Empty Notification State Updated",
+        "path": "lib/features/notifications/views/widgets/empty_notification_state_updated.dart"
       },
       {
         "name": "Notifications Notification Badge",
@@ -278,8 +286,28 @@
         "path": "lib/features/profile/views/widgets/profile_main_widgets/user_details_card.dart"
       },
       {
+        "name": "Product Promotion",
+        "path": "lib/features/promotion/views/screens/product_promotion.dart"
+      },
+      {
+        "name": "Product Promotion Card",
+        "path": "lib/features/promotion/views/widgets/product_promotion_card.dart"
+      },
+      {
+        "name": "Promotion Banner",
+        "path": "lib/features/promotion/views/widgets/promotion_banner.dart"
+      },
+      {
+        "name": "Promotion State",
+        "path": "lib/features/promotion/views/widgets/promotion_state.dart"
+      },
+      {
         "name": "No Search Result",
         "path": "lib/features/search/no_search_result.dart"
+      },
+      {
+        "name": "Settings Language Card",
+        "path": "lib/features/settings/views/widgets/settings_language_card.dart"
       },
       {
         "name": "Main",
@@ -292,12 +320,20 @@
         "path": "lib/app/core/localization/localization_service.dart"
       },
       {
+        "name": "Connection Service",
+        "path": "lib/app/core/services/connection_service.dart"
+      },
+      {
         "name": "Pusher Service",
         "path": "lib/app/core/services/pusher_service.dart"
       },
       {
         "name": "Storage Service",
         "path": "lib/app/core/services/storage_service.dart"
+      },
+      {
+        "name": "Theme Aware Snackbar Service",
+        "path": "lib/app/core/services/theme_aware_snackbar_service.dart"
       },
       {
         "name": "Service Locator",
@@ -312,8 +348,12 @@
         "path": "lib/features/auth/services/notification_service.dart"
       },
       {
-        "name": "Profile User API Service",
-        "path": "lib/features/profile/services/user_api_service.dart"
+        "name": "Payment Service",
+        "path": "lib/features/payment/services/payment_service.dart"
+      },
+      {
+        "name": "Payment Stripe Service",
+        "path": "lib/features/payment/services/stripe_service.dart"
       }
     ],
     "theme": [
@@ -338,6 +378,10 @@
         "path": "lib/app/core/theme/app_theme_colors.dart"
       },
       {
+        "name": "App Theme Test",
+        "path": "lib/app/core/theme/app_theme_test.dart"
+      },
+      {
         "name": "App Typography",
         "path": "lib/app/core/theme/app_typography.dart"
       },
@@ -360,8 +404,16 @@
     ],
     "utils": [
       {
+        "name": "Language Font Utility",
+        "path": "lib/app/core/localization/language_font_utility.dart"
+      },
+      {
         "name": "Auth Jwt Utils",
         "path": "lib/features/auth/services/jwt_utils.dart"
+      },
+      {
+        "name": "Promotion Utils",
+        "path": "lib/features/promotion/utils/promotion_utils.dart"
       }
     ],
     "dependency_injection": [
@@ -388,6 +440,10 @@
       {
         "name": "On Boarding Onboarding Carousel Image",
         "path": "lib/features/onBoarding/views/widgets/onboarding_carousel_image.dart"
+      },
+      {
+        "name": "On Boarding Onboarding Image Slider",
+        "path": "lib/features/onBoarding/views/widgets/onboarding_image_slider.dart"
       },
       {
         "name": "Profile Name Display",
@@ -451,6 +507,10 @@
         "path": "lib/features/home/views/widgets/card_comps/favorite_button.dart"
       },
       {
+        "name": "On Boarding Gender Button",
+        "path": "lib/features/onBoarding/views/widgets/gender_button.dart"
+      },
+      {
         "name": "Product Add To Cart Button",
         "path": "lib/features/product/views/widgets/product_detail/add_to_cart_button.dart"
       },
@@ -469,8 +529,20 @@
         "path": "lib/features/address/controller/address_controller.dart"
       },
       {
+        "name": "Auth Forget Password Controller",
+        "path": "lib/features/auth/controllers/forget_password_controller.dart"
+      },
+      {
         "name": "Auth Login Controller",
         "path": "lib/features/auth/controllers/login_controller.dart"
+      },
+      {
+        "name": "Auth New Reset Password Controller",
+        "path": "lib/features/auth/controllers/new_reset_password_controller.dart"
+      },
+      {
+        "name": "Auth Otp Verification Controller",
+        "path": "lib/features/auth/controllers/otp_verification_controller.dart"
       },
       {
         "name": "Auth Signup Controller",
@@ -487,6 +559,10 @@
       {
         "name": "Category Product Controller",
         "path": "lib/features/category_product/controller/category_product_controller.dart"
+      },
+      {
+        "name": "Checkout Controller",
+        "path": "lib/features/checkout/controllers/checkout_controller.dart"
       },
       {
         "name": "Product Filter Controller",
@@ -545,8 +621,20 @@
         "path": "lib/features/profile/controllers/profile_controller.dart"
       },
       {
+        "name": "Promotion Controller",
+        "path": "lib/features/promotion/controller/promotion_controller.dart"
+      },
+      {
         "name": "Review Controller",
         "path": "lib/features/review/controllers/review_controller.dart"
+      },
+      {
+        "name": "Search Controller",
+        "path": "lib/features/search/controllers/search_controller.dart"
+      },
+      {
+        "name": "Settings Language Controller",
+        "path": "lib/features/settings/controllers/settings_language_controller.dart"
       },
       {
         "name": "Subcategory Controller",
@@ -571,6 +659,18 @@
         "path": "lib/features/category/models/category.model.dart"
       },
       {
+        "name": "Checkout Address Model",
+        "path": "lib/features/checkout/models/address_model.dart"
+      },
+      {
+        "name": "Checkout Order Request Model",
+        "path": "lib/features/checkout/models/order_request_model.dart"
+      },
+      {
+        "name": "Checkout Payment Method Model",
+        "path": "lib/features/checkout/models/payment_method_model.dart"
+      },
+      {
         "name": "Home Color Variant Model",
         "path": "lib/features/home/models/color_variant_model.dart"
       },
@@ -591,12 +691,36 @@
         "path": "lib/features/order/model/order_model.dart"
       },
       {
+        "name": "Order Model",
+        "path": "lib/features/order/models/order_model.dart"
+      },
+      {
+        "name": "Payment History Model",
+        "path": "lib/features/payment/models/payment_history_model.dart"
+      },
+      {
+        "name": "Payment Method Model",
+        "path": "lib/features/payment/models/payment_method_model.dart"
+      },
+      {
+        "name": "Payment Request Model",
+        "path": "lib/features/payment/models/payment_request_model.dart"
+      },
+      {
+        "name": "Payment Result Model",
+        "path": "lib/features/payment/models/payment_result_model.dart"
+      },
+      {
         "name": "Product Model",
         "path": "lib/features/product/models/product_model.dart"
       },
       {
         "name": "Profile User Model",
         "path": "lib/features/profile/models/user_model.dart"
+      },
+      {
+        "name": "Promotion Model",
+        "path": "lib/features/promotion/models/promotion_model.dart"
       },
       {
         "name": "Review Model",
@@ -625,6 +749,10 @@
         "path": "lib/features/category/repositories/category_repository.dart"
       },
       {
+        "name": "Checkout Order Repository",
+        "path": "lib/features/checkout/repositories/order_repository.dart"
+      },
+      {
         "name": "Notifications Notification Repository",
         "path": "lib/features/notifications/repository/notification_repository.dart"
       },
@@ -643,6 +771,10 @@
       {
         "name": "Profile Repository",
         "path": "lib/features/profile/repositories/profile_repository.dart"
+      },
+      {
+        "name": "Promotion Repository",
+        "path": "lib/features/promotion/repositories/promotion_repository.dart"
       },
       {
         "name": "Review Repository",
@@ -675,6 +807,10 @@
         "path": "lib/features/category_product/binding/category_product_binding.dart"
       },
       {
+        "name": "Checkout Binding",
+        "path": "lib/features/checkout/binding/checkout_binding.dart"
+      },
+      {
         "name": "Filter Binding",
         "path": "lib/features/filter/binding/filter_binding.dart"
       },
@@ -691,6 +827,10 @@
         "path": "lib/features/order/binding/order_binding.dart"
       },
       {
+        "name": "Payment Binding",
+        "path": "lib/features/payment/binding/payment_binding.dart"
+      },
+      {
         "name": "Product Binding",
         "path": "lib/features/product/binding/product_binding.dart"
       },
@@ -703,8 +843,16 @@
         "path": "lib/features/profile/bindings/profile_binding.dart"
       },
       {
+        "name": "Promotion Binding",
+        "path": "lib/features/promotion/binding/promotion_binding.dart"
+      },
+      {
         "name": "Review Binding",
         "path": "lib/features/review/binding/review_binding.dart"
+      },
+      {
+        "name": "Settings Language Binding",
+        "path": "lib/features/settings/bindings/settings_language_binding.dart"
       },
       {
         "name": "Wishlist Binding",
@@ -712,6 +860,10 @@
       }
     ],
     "screens": [
+      {
+        "name": "Order Failure Screen",
+        "path": "lib/app/screens/order_failure_screen.dart"
+      },
       {
         "name": "Main Container Screen",
         "path": "lib/app/shared/layouts/main_container_screen.dart"
@@ -745,8 +897,12 @@
         "path": "lib/features/auth/views/screen/login_screen.dart"
       },
       {
-        "name": "Auth Reset Password Screen",
-        "path": "lib/features/auth/views/screen/reset_password_screen.dart"
+        "name": "Auth New Reset Password Screen",
+        "path": "lib/features/auth/views/screen/new_reset_password_screen.dart"
+      },
+      {
+        "name": "Auth Otp Verification Screen",
+        "path": "lib/features/auth/views/screen/otp_verification_screen.dart"
       },
       {
         "name": "Auth Signup Screen",
@@ -775,6 +931,10 @@
       {
         "name": "Category Product Subcategory List View",
         "path": "lib/features/category_product/view/widgets/subcategory_list_view.dart"
+      },
+      {
+        "name": "Checkout Screen",
+        "path": "lib/features/checkout/views/screens/checkout_screen.dart"
       },
       {
         "name": "Filter Product Sheet",
@@ -857,8 +1017,20 @@
         "path": "lib/features/onBoarding/views/profile_setup_screen.dart"
       },
       {
+        "name": "On Boarding Profile Setup Screen New",
+        "path": "lib/features/onBoarding/views/profile_setup_screen_new.dart"
+      },
+      {
+        "name": "Orders Details Screen",
+        "path": "lib/features/order/view/screen/orders_details_screen.dart"
+      },
+      {
         "name": "Orders Screen",
         "path": "lib/features/order/view/screen/orders_screen.dart"
+      },
+      {
+        "name": "Order Confirmation Screen",
+        "path": "lib/features/order/view/screen/order_confirmation_screen.dart"
       },
       {
         "name": "Empty Order State",
@@ -867,10 +1039,6 @@
       {
         "name": "Order Error View",
         "path": "lib/features/order/view/widget/error_view.dart"
-      },
-      {
-        "name": "Orders Details Screen",
-        "path": "lib/features/order/view/widget/orders_details_screen.dart"
       },
       {
         "name": "Order Item",
@@ -893,40 +1061,52 @@
         "path": "lib/features/order/view/widget/status_tab.dart"
       },
       {
-        "name": "Payment Add Paypal",
-        "path": "lib/features/payment/view/add_paypal.dart"
+        "name": "Payment Add Card Page",
+        "path": "lib/features/payment/view/screen/add_card_page.dart"
       },
       {
-        "name": "Edit Payment",
-        "path": "lib/features/payment/view/edit_payment.dart"
+        "name": "Payment Add Card Screen",
+        "path": "lib/features/payment/view/screen/add_card_screen.dart"
+      },
+      {
+        "name": "Payment Failure Screen",
+        "path": "lib/features/payment/view/screen/payment_failure_screen.dart"
+      },
+      {
+        "name": "Payment History Screen",
+        "path": "lib/features/payment/view/screen/payment_history_screen.dart"
+      },
+      {
+        "name": "Payment Processing Screen",
+        "path": "lib/features/payment/view/screen/payment_processing_screen.dart"
       },
       {
         "name": "Payment Screen",
         "path": "lib/features/payment/view/screen/payment_screen.dart"
       },
       {
-        "name": "Payment Add Card Screen",
-        "path": "lib/features/payment/view/widget/add_card_screen.dart"
+        "name": "Payment Success Screen",
+        "path": "lib/features/payment/view/screen/payment_success_screen.dart"
       },
       {
         "name": "Payment Add Paument Methode",
         "path": "lib/features/payment/view/widget/add_paument_methode.dart"
       },
       {
-        "name": "Add Payment",
-        "path": "lib/features/payment/view/widget/add_payment.dart"
-      },
-      {
-        "name": "Payment Add Paypal",
-        "path": "lib/features/payment/view/widget/add_paypal.dart"
-      },
-      {
         "name": "Edit Payment",
         "path": "lib/features/payment/view/widget/edit_payment.dart"
       },
       {
+        "name": "Payment Card Form",
+        "path": "lib/features/payment/view/widget/payment_card_form.dart"
+      },
+      {
         "name": "Payment Item",
         "path": "lib/features/payment/view/widget/payment_item.dart"
+      },
+      {
+        "name": "Payment Method Card",
+        "path": "lib/features/payment/view/widget/payment_method_card.dart"
       },
       {
         "name": "Product Detail Screen",
@@ -947,6 +1127,10 @@
       {
         "name": "Profile Screen",
         "path": "lib/features/profile/views/screens/profile_screen.dart"
+      },
+      {
+        "name": "Promotion Product Page",
+        "path": "lib/features/promotion/views/widgets/promotion_product_page.dart"
       },
       {
         "name": "Review Screen",
@@ -993,6 +1177,14 @@
         "path": "lib/features/review/view/widgets/review_section/review_section.dart"
       },
       {
+        "name": "Search Page",
+        "path": "lib/features/search/views/search_page.dart"
+      },
+      {
+        "name": "Settings Language Screen",
+        "path": "lib/features/settings/views/settings_language_screen.dart"
+      },
+      {
         "name": "Settings Setting Screen",
         "path": "lib/features/settings/views/setting_screen.dart"
       },
@@ -1023,8 +1215,8 @@
         "path": "lib/features/wishlist/views/widget/wishlist_header.dart"
       },
       {
-        "name": "Wishlist Item Tile",
-        "path": "lib/features/wishlist/views/widget/wishlist_item_tile.dart"
+        "name": "Wishlist Item Card",
+        "path": "lib/features/wishlist/views/widget/wishlist_item_card.dart"
       }
     ],
     "project_config": [

@@ -317,7 +317,7 @@ jobs:
         id: build_apk
         run: |
           cd generated-app
-          flutter build apk --target-platform android-arm64 --analyze-size
+          flutter build apk --target-platform android-x64 --analyze-size
           
       - name: Check APK size
         run: |
